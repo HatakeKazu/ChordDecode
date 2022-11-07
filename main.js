@@ -7,7 +7,7 @@ phina.globalize();
 
 var SCREEN_WIDTH    = 640;
 var SCREEN_HEIGHT   = 960;
-var MAX_PER_LINE    = 5;                            // ピースの横に並ぶ最大数
+var MAX_PER_LINE    = 2;                            // ピースの横に並ぶ最大数
 var PIECE_SIZE      = 100;
 var BOARD_PADDING   = 40;
 
@@ -142,8 +142,13 @@ phina.define('ResultScene', {
     
     // デフォルトの処理(Twitter シェア)を上書きする
     this.shareButton.onclick = function() {
-      // 特定の URL を開く
-      window.open('https://phiary.me');
+      var text = 'Score: {0}\n{1}'.format(3, "good");
+      var url = phina.social.Twitter.createURL({
+        text: text,
+        hashtags: "game",
+        url: phina.global.location && phina.global.location.href,
+      });
+      window.open(url, 'share window', 'width=480, height=320');
     };
     
     // オリジナルのボタンを追加してみる
