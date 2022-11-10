@@ -7,24 +7,14 @@ phina.globalize();
 
 var SCREEN_WIDTH    = 640;
 var SCREEN_HEIGHT   = 960;
-var MAX_PER_LINE    = 2;                            // ピースの横に並ぶ最大数
-var PIECE_SIZE      = 100;
 var BOARD_PADDING   = 5;
-
-
 
 var WHITEKEY_WIDTH = SCREEN_WIDTH /10; //白鍵の数
 var BLACKLEY_WIDTH = SCREEN_WIDTH / 10 - 10; //若干小さく
-var MAX_NUM         = MAX_PER_LINE*MAX_PER_LINE;    // ピース全体の数
+
 var BOARD_SIZE      = SCREEN_WIDTH - BOARD_PADDING*2;
 var BOARD_OFFSET_X  = BOARD_PADDING+40;
-var PIECE_APPEAR_ANIMATION = {
-  // loop: true,
-  tweens: [
-    ['to', {rotation:360}, 500],
-    ['set', {rotation:0}],
-  ]
-};
+
 var KEY_SCALE       = 12;
 var QUESTION_NUM    = 5;
 var id2Root = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"
@@ -89,14 +79,11 @@ phina.define("MainScene", {
       height: SCREEN_HEIGHT,
     });
 
-    this.currentIndex = 1;
     this.currentCorrectAnsNum = 0;
 
     this.group = DisplayElement().addChildTo(this);
-
     var gridX = Grid(BOARD_SIZE, 16);
     var gridY = Grid(BOARD_SIZE, 8);
-
     var self = this;
 
     var numbers = [0,2,4,5,7,9,11,12,1,3,6,8,10]; //白鍵を先に配置
