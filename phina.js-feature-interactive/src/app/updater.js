@@ -30,7 +30,7 @@ phina.namespace(function() {
       if (element.update) element.update(app);
 
       // タッチ判定
-      // this._checkPoint(element);
+      this._checkPoint(element);
 
       // 子供を更新
       var len = element.children.length;

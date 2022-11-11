@@ -8892,16 +8892,17 @@ phina.namespace(function() {
 
       // 子供を更新
       var len = element.children.length;
+      
       if (element.children.length > 0) {
         var tempChildren = element.children.slice();
         for (var i=0; i<len; ++i) {
+        //for (var i=len-1; i>0; i--) {
           this._updateElement(tempChildren[i]);
         }
       }
     },
 
     _checkPoint: function(obj) {
-
       this.app.pointers.forEach(function(p) {
         if (p.id !== null) {
           this.__checkPoint(obj, p);
@@ -9012,7 +9013,7 @@ phina.namespace(function() {
       if (element.children.length > 0) {
         var tempChildren = element.children.slice();
         for (var i=0; i<len; ++i) {
-          this._checkElement(tempChildren[i]);
+          this._checkElement(tempChildren[len - 1 - i]);
         }
       }
 

@@ -134,7 +134,8 @@ phina.define("MainScene", {
     
     this._tmpChord = nextChord(firstChord);
     this.currentChord_key_bit = this._tmpChord.key_bit;
-
+    
+    this._keyUpdate = false; //1個押されたら次のフレームまで他は発火させない
 
     var question = Label('Xm').addChildTo(this);
     question.setPosition(this.gridX.span(2), this.gridY.span(2));
@@ -165,8 +166,13 @@ phina.define("MainScene", {
       p.y = gridY.span(yIndex)+150;
 
       p.onpointstart = function() {
-        self.check(this);
+        if(!self._keyUpdate){
+          self.check(this);
+          self._keyUpdate = true;
+        }
+        
       };
+      
       //p.appear();
     });
     this.keyButtons = arr;
@@ -207,6 +213,7 @@ phina.define("MainScene", {
     this.time += app.ticker.deltaTime;
     var sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
+    this._keyUpdate = false;
   },
 
   check: function(piece) {
@@ -273,6 +280,7 @@ phina.define('Piano_key',{
       fill: my_color, //FFF = 白, 000 = 黒
       text:'',
     });
+    this.setInteractive(true);
     this.index = index;
     this.active = false;
   }
