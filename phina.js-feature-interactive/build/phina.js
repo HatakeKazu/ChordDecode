@@ -9013,7 +9013,7 @@ phina.namespace(function() {
       if (element.children.length > 0) {
         var tempChildren = element.children.slice();
         for (var i=0; i<len; ++i) {
-          this._checkElement(tempChildren[len - 1 - i]);
+          this._checkElement(tempChildren[len - 1 - i]); //逆順に走査する（後から追加したものを先に判定）
         }
       }
 
