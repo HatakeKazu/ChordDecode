@@ -153,14 +153,16 @@ phina.define("MainScene", {
       var xIndex = keyLayout_x[index];
       var yIndex = keyLayout_y[index];
       var col = '#000';
-      var height = 180;
+      var height = 190;
       var width = BLACKLEY_WIDTH;
+      var isBlack = true;
       if(whitekeys.includes(index)){
         col = '#fff';
-        height = 300;
+        height = 345;
         width = WHITEKEY_WIDTH;
+        isBlack = false;
       }
-      var p = Piano_key(index,col,width,height).addChildTo(self.group);
+      var p = Piano_key(index,col,width,height,isBlack).addChildTo(self.group);
       arr.push(p);
       p.x = gridX.span(xIndex)+BOARD_OFFSET_X;
       p.y = gridY.span(yIndex)+150;
@@ -219,13 +221,11 @@ phina.define("MainScene", {
   check: function(piece) {
     if(piece.active){
       //押された状態に押されてもとに戻ったとき
-      piece.alpha = 1.0;
-      piece.active = false;
+      piece.pushed();
       this.user_key_bit -= id2keybit(piece.index);
     }else{
       //押されたとき
-      piece.alpha = 0.5;
-      piece.active = true;
+      piece.pushed();
       this.user_key_bit += id2keybit(piece.index);
     }
     
@@ -239,8 +239,7 @@ phina.define("MainScene", {
       //諸々をリセット
       this.user_key_bit = 0;
       this.keyButtons.forEach(function(element){
-        element.active = false;
-        element.alpha = 1.0;
+        element.reset();
       });
 
       //次の準備
@@ -271,7 +270,7 @@ phina.define("MainScene", {
 
 phina.define('Piano_key',{
   superClass: 'Button',
-  init: function(index,my_color,width,height){
+  init: function(index,my_color,width,height,isBlack){
     this.superInit({
       width:width,
       height:height,
@@ -283,6 +282,31 @@ phina.define('Piano_key',{
     this.setInteractive(true);
     this.index = index;
     this.active = false;
+    this.isBlack = isBlack;
+  },
+  pushed: function(){
+    if(this.active){ //すでに押された状態で押された
+      if(this.isBlack){
+        this.fill = '#000';
+      }else{
+        this.fill = '#fff';
+      }
+    }else{ //押されてない状態から押された
+      if(this.isBlack){
+        this.fill = '#a00';
+      }else{
+        this.fill = '#a00';
+      }
+    }
+    this.active = !this.active;
+  },
+  reset: function(){
+    this.active = false;
+    if(this.isBlack){
+      this.fill = '#000';
+    }else{
+      this.fill = '#fff';
+    }
   }
   
 })
