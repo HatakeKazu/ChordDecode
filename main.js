@@ -361,7 +361,7 @@ phina.define('ResultScene', {
             // strokeWidth: 2,
           }],
           x: this.gridX.center(-3),
-          y: this.gridY.span(12),
+          y: this.gridY.span(14),
         },
         playButton: {
           className: 'phina.ui.Button',
@@ -377,7 +377,7 @@ phina.define('ResultScene', {
             // strokeWidth: 2,
           }],
           x: this.gridX.center(3),
-          y: this.gridY.span(12),
+          y: this.gridY.span(14),
 
           interactive: true,
           onpush: function() {
@@ -423,6 +423,35 @@ phina.define('ResultScene', {
 
 });
 
+//設定シーン
+phina.define('OptionScene',{
+  superClass:'DisplayScene',
+  init: function(){
+    this.superInit();
+    //設定
+    var button = Button({
+      width:120,
+      height:120,
+      cornerRadius: 3,
+      backgroundColor: '#aaa',
+      fill: '#fff', //FFF = 白, 000 = 黒
+      text:''});
+    button.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
+    button.onpointstart = function(){
+      alert("huga");
+    };
+    /*
+    let button2 = Button('exit');
+    button2.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
+    button2.onpointstart = function(){
+      this.exit('TiteScene');
+    };
+    */
+  },
+  
+
+
+});
 
 // タイトルシーン
 phina.define('TitleScene', {
@@ -431,6 +460,20 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.backgroundColor = 'hsl(200, 80%, 64%)';
+    
+    //設定
+    var button = Button({
+      width:360,
+      height:360,
+      cornerRadius: 3,
+      backgroundColor: '#aaa',
+      fill: '#fff', //FFF = 白, 000 = 黒
+      text:''});
+    button.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
+    button.setInteractive(true);
+    button.onpointstart = function(){
+      this.exit;
+    };
     
     // タイトル
     Label({
@@ -457,10 +500,31 @@ phina.define('TitleScene', {
 
 phina.main(function() {
   var app = GameApp({
-    startLabel: location.search.substr(1).toObject().scene || 'title',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    startLabel: 'title',
+    startLabel: 'TitleScene',
+    scenes: [
+      {
+        className: 'TitleScene',
+        label: 'TitleScene',
+        nextLabel: 'MainScene',
+      },
+      {
+        className: 'OptionScene',
+        label: 'OptionScene',
+        nextLabel: 'TitleScene',
+      },
+      {
+        className: 'MainScene',
+        label: 'MainScene',
+        nextLabel: 'ResultScene',
+      },
+      {
+        className: 'ResultScene',
+        label: 'ResultScene',
+        nextLabel: 'TitleScene',
+      },
+    ]
   });
 
   app.enableStats();
