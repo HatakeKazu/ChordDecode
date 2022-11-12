@@ -5,79 +5,7 @@
 
 phina.globalize();
 
-var SCREEN_WIDTH    = 640;
-var SCREEN_HEIGHT   = 960;
-var BOARD_PADDING   = 5;
-
-var WHITEKEY_WIDTH = SCREEN_WIDTH /10; //白鍵の数
-var BLACKLEY_WIDTH = SCREEN_WIDTH / 10 - 10; //若干小さく
-
-var BOARD_SIZE      = SCREEN_WIDTH - BOARD_PADDING*2;
-var BOARD_OFFSET_X  = BOARD_PADDING+40;
-
-var KEY_SCALE       = 12;
-var QUESTION_NUM    = 5;
-var id2Root = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"
-              ,"C","D♭","D","E♭","E","F","G♭","G","A♭","A"];
-var CHORD_TYPE = ["","m","7","sus4","m7","M7"];
-var COMPOSITION = {
-  m:[0,3,7],
-  7:[0,4,7,10] 
-}
-var TYPE_LIMIT = 3; //CHORD_TYPE.length; //難易度調整に
-
-function id2keybit(id){
-  return Math.pow(2,id%KEY_SCALE);
-}
-
-function calcKey_Bit(root_id, chord_type_num){
-  var ret = 0;
-  if(CHORD_TYPE[chord_type_num] in COMPOSITION){
-    var compos = COMPOSITION[CHORD_TYPE[chord_type_num]];
-    compos.forEach(function(element){
-      ret += id2keybit((root_id + element)%KEY_SCALE);
-    });
-  }else{
-    //純粋なトライアドのメジャーコード
-    var compos = [0,4,7];
-    compos.forEach(function(element){
-      ret += id2keybit((root_id + element)%KEY_SCALE);
-    });
-  }
-  return ret;
-}
-
-function nextChord(chord_dict){
-  /*
-  テーマ和音を選択、現状とは被らせたくないので今の和音を渡す
-  和音はrootと和音種類の組み合わせ
-  */
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
-  var _pre_root = chord_dict.root;
-  var _root = getRandomInt(id2Root.length);
-  var _root2id = _root % 12;
-  while(_root2id == _pre_root){//前回と同じ根音は避ける
-    _root = getRandomInt(id2Root.length);
-    _root2id = _root % 12;
-  }
-  var _type_num = getRandomInt(TYPE_LIMIT);
-  return {
-    name:id2Root[_root] + CHORD_TYPE[_type_num],
-    key_bit:calcKey_Bit(_root2id,_type_num),
-    root:_root2id,
-    type:_type_num
-  };
-}
-
-var TUNE = 442;
-var audioCtx;
-function calcFreq(index){
-  base = 9; //id of A = 9
-
-  return TUNE *  Math.pow(2,(index-9)/12);
-}
+var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
 
 phina.define("MainScene", {
   superClass: 'DisplayScene',
@@ -88,23 +16,19 @@ phina.define("MainScene", {
       height: SCREEN_HEIGHT,
     });
 
-    this.currentCorrectAnsNum = 0;
-
+    //UI関連
+    var self = this;
     this.group = DisplayElement().addChildTo(this);
     var gridX = Grid(BOARD_SIZE, 16);
     var gridY = Grid(BOARD_SIZE, 8);
-    var self = this;
-
-    var numbers = [0,2,4,5,7,9,11,12,1,3,6,8,10]; //白鍵を先に配置
-    const whitekeys = [0,2,4,5,7,9,11,12];
-    const keyLayout_x = [0,1,2,3,4,6,7,8,9,10,11,12,14];
-    const keyLayout_y = [6,5,6,5,6,6,5,6,5,6,5,6,6];
     
-    this.keyButtons = [];//後々push
-
-
+    //音関連
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.audioCtx = audioCtx;
+    this.keyButtons = [];//後々登録する
+
+
+    
     
     /*
     ■鍵盤の表現について
@@ -133,7 +57,7 @@ phina.define("MainScene", {
     }
     の形で渡すこと(chord_dict)
     */
-    
+    this.currentCorrectAnsNum = 0;
     
     var currentChord_key_bit = -1;
     var currentChord_name = "none";
@@ -186,12 +110,10 @@ phina.define("MainScene", {
         if(!self._keyUpdate){
           self.check(this);
           self._keyUpdate = true;
-        }
-        
+        }        
       };
-      
-      //p.appear();
     });
+    
     this.keyButtons = arr;
 
     // タイマーラベルを生成
