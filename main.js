@@ -7,6 +7,32 @@ phina.globalize();
 
 var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
 
+function correctSound(){
+  sec = 0.1;
+  
+  const osc = audioCtx.createOscillator();
+  osc.frequency.value = 1320*Math.pow(2,5/12);
+  const gainNode = audioCtx.createGain();
+  osc.type = "triangle";
+  osc.connect(gainNode);
+  gainNode.gain.value = sound_vol;
+  gainNode.connect(audioCtx.destination);
+  osc.start(0);
+  osc.stop(audioCtx.currentTime + sec);
+
+  
+  const osc2 = audioCtx.createOscillator();
+  osc2.frequency.value = 1320 * Math.pow(2,1/12);
+  const gainNode2 = audioCtx.createGain();
+  osc2.type = "sine";
+  osc2.connect(gainNode2);
+  gainNode2.gain.value = sound_vol;
+  gainNode2.connect(audioCtx.destination);
+  osc2.start(audioCtx.currentTime + sec);
+  osc2.stop(audioCtx.currentTime + sec + sec);
+}
+
+
 phina.define("MainScene", {
   superClass: 'DisplayScene',
 
@@ -127,7 +153,7 @@ phina.define("MainScene", {
     timerLabel.baseline = 'bottom';
     this.timerLabel = timerLabel;
 
-    this.time = 0;
+    this.time = TIME_LIMIT * 1000;
 
     this.onpointstart = function(e) {
       var p = e.pointer;
@@ -149,7 +175,10 @@ phina.define("MainScene", {
 
   update: function(app) {
     // タイマーを更新
-    this.time += app.ticker.deltaTime;
+    this.time -= app.ticker.deltaTime;
+    if(this.time <= 0){
+      this.exit({score: 100});
+    }
     var sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
     this._keyUpdate = false;
@@ -172,6 +201,8 @@ phina.define("MainScene", {
       //正解に達した
       this.currentCorrectAnsNum += 1;
       
+      setTimeout(() => {correctSound();}, 150);//ちょっと遅延させて正解音を出す
+      
       
       //諸々をリセット
       this.user_key_bit = 0;
@@ -186,7 +217,8 @@ phina.define("MainScene", {
       this.bit_db.text = this.user_key_bit;
       
     }
-
+    /*
+    //規定問題数で終了の名残
     if (this.currentCorrectAnsNum == QUESTION_NUM) {
       this.exit({
         score: 100,
@@ -195,6 +227,7 @@ phina.define("MainScene", {
     else {
       this.currentIndex += 1;
     }
+    */
     
   }
 
@@ -235,10 +268,11 @@ phina.define('Piano_key',{
       }else{
         this.fill = '#a00';
       }
+      //音を鳴らす処理
       var oscillator = audioCtx.createOscillator();
       oscillator.frequency.value = this.myFreq; // value in hertz
       var gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.1;
+      gainNode.gain.value = sound_vol;
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       this.oscillator = oscillator;
@@ -258,41 +292,167 @@ phina.define('Piano_key',{
   
 })
 
+/**
+ * @class phina.game.ResultScene
+ *
+ */
 phina.define('ResultScene', {
-  // デフォルトの ResultScene を上書き
-  superClass: 'ResultScene',
-  
-  init: function() {
-    this.superInit();
-    
-    // デフォルトの処理(Twitter シェア)を上書きする
+  superClass: 'DisplayScene',
+  /**
+   * @constructor
+   */
+  init: function(params) {
+    this.superInit(params);
+
+    params = ({}).$safe(params, phina.game.ResultScene.defaults);
+
+    var message = params.message.format(params);
+
+    this.backgroundColor = params.backgroundColor;
+
+    this.fromJSON({
+      children: {
+        scoreText: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: 'score',
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 48,
+          },
+          x: this.gridX.span(8),
+          y: this.gridY.span(4),
+        },
+        scoreLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: params.score+'',
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 72,
+          },
+          x: this.gridX.span(8),
+          y: this.gridY.span(6),
+        },
+
+        messageLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: message,
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 32,
+          },
+          x: this.gridX.center(),
+          y: this.gridY.span(9),
+        },
+
+        shareButton: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'Tweet',
+            width: 220,
+            height: 128,
+            fontColor: params.fontColor,
+            fontSize: 50,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.center(-3),
+          y: this.gridY.span(12),
+        },
+        playButton: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'Retry',
+            width: 220,
+            height: 128,
+            fontColor: params.fontColor,
+            fontSize: 50,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.center(3),
+          y: this.gridY.span(12),
+
+          interactive: true,
+          onpush: function() {
+            this.exit();
+          }.bind(this),
+        },
+      }
+    });
+
+    if (params.exitType === 'touch') {
+      this.on('pointend', function() {
+        this.exit();
+      });
+    }
+
     this.shareButton.onclick = function() {
-      var text = 'Score: {0}\n{1}'.format(3, "good");
+      var text = 'Score: {0}\n{1}'.format(params.score, message);
       var url = phina.social.Twitter.createURL({
         text: text,
-        hashtags: "game",
-        url: phina.global.location && phina.global.location.href,
+        hashtags: params.hashtags,
+        url: params.url,
       });
       window.open(url, 'share window', 'width=480, height=320');
     };
-    
-    // オリジナルのボタンを追加してみる
-    var circle = CircleShape({
-      radius: 64,
-      fill: 'white',
-      stroke: null,
-    }).addChildTo(this);
-    // 位置を調整
-    circle.setPosition(320, 840);
-    // タッチを有効に
-    circle.interactive = true;
-    // クリック時の処理を登録
-    circle.onclick = function() {
-      // 特定の URL を開く
-      window.open('https://phiary.me');
-    };
   },
-})
+
+  _static: {
+    defaults: {
+      score: 16,
+
+      message: 'this is phina.js project.',
+      hashtags: 'phina_js,game,javascript',
+      url: phina.global.location && phina.global.location.href,
+
+      width: 640,
+      height: 960,
+
+      fontColor: 'white',
+      backgroundColor: 'hsl(200, 80%, 64%)',
+      backgroundImage: '',
+    },
+  },
+
+});
+
+
+// タイトルシーン
+phina.define('TitleScene', {
+  superClass: 'DisplayScene',
+  // コンストラクタ
+  init: function() {
+    this.superInit();
+    this.backgroundColor = 'hsl(200, 80%, 64%)';
+    
+    // タイトル
+    Label({
+      text: 'Chord Decode',
+      fontSize: 64,
+      fill:'white',
+    }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.span(4));
+
+    Label({
+      text: "TOUCH START",
+      fontSize: 32,
+    }).addChildTo(this)
+      .setPosition(this.gridX.center(), this.gridY.span(12))
+      .tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
+    // 画面タッチ時
+    this.on('pointend', function() {
+      // 次のシーンへ
+      this.exit();
+    });
+    
+  }
+});
 
 
 phina.main(function() {

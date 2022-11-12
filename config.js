@@ -35,11 +35,11 @@ const COLOR_BLACK = '#000';
 const COLOR_PRESSED_WHITE = '#a00';
 const COLOR_PRESSED_BLACK = '#a00';
 const SOUND_KEEP = 100; //鳴る時間
-
+var sound_vol = 0.5;
 
 //ゲーム関係
 const TYPE_LIMIT = 3; //CHORD_TYPE.length; //難易度調整に
-const QUESTION_NUM    = 5;
+const QUESTION_NUM    = 2;
 const TIME_LIMIT = 10; //秒数制限でのスコアアタックにしたい
 
 
