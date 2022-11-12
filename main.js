@@ -70,6 +70,15 @@ function nextChord(chord_dict){
     type:_type_num
   };
 }
+
+var TUNE = 442;
+var audioCtx;
+function calcFreq(index){
+  base = 9; //id of A = 9
+
+  return TUNE *  Math.pow(2,(index-9)/12);
+}
+
 phina.define("MainScene", {
   superClass: 'DisplayScene',
 
@@ -92,6 +101,11 @@ phina.define("MainScene", {
     const keyLayout_y = [6,5,6,5,6,6,5,6,5,6,5,6,6];
     
     this.keyButtons = [];//後々push
+
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    this.audioCtx = audioCtx;
+    
     /*
     ■鍵盤の表現について
 
@@ -162,6 +176,7 @@ phina.define("MainScene", {
         width = WHITEKEY_WIDTH;
         isBlack = false;
       }
+      
       var p = Piano_key(index,col,width,height,isBlack).addChildTo(self.group);
       arr.push(p);
       p.x = gridX.span(xIndex)+BOARD_OFFSET_X;
@@ -261,8 +276,6 @@ phina.define("MainScene", {
     
   }
 
-  
-
 });
 
 
@@ -283,6 +296,9 @@ phina.define('Piano_key',{
     this.index = index;
     this.active = false;
     this.isBlack = isBlack;
+    this.freq = calcFreq(index);
+    this.myFreq = calcFreq(index);
+    
   },
   pushed: function(){
     if(this.active){ //すでに押された状態で押された
@@ -297,6 +313,15 @@ phina.define('Piano_key',{
       }else{
         this.fill = '#a00';
       }
+      var oscillator = audioCtx.createOscillator();
+      oscillator.frequency.value = this.myFreq; // value in hertz
+      var gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.1;
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      this.oscillator = oscillator;
+      this.oscillator.start();
+      setTimeout( () => { this.oscillator.stop() }, 100 );
     }
     this.active = !this.active;
   },
