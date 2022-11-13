@@ -361,7 +361,7 @@ phina.define('ResultScene', {
             // strokeWidth: 2,
           }],
           x: this.gridX.center(-3),
-          y: this.gridY.span(14),
+          y: this.gridY.span(12),
         },
         playButton: {
           className: 'phina.ui.Button',
@@ -377,7 +377,7 @@ phina.define('ResultScene', {
             // strokeWidth: 2,
           }],
           x: this.gridX.center(3),
-          y: this.gridY.span(14),
+          y: this.gridY.span(12),
 
           interactive: true,
           onpush: function() {
@@ -430,6 +430,74 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.backgroundColor = 'hsl(200, 80%, 64%)';
+    
+    this.fromJSON({
+      children:{
+        playButton_easy: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'EASY',
+            width: 220,
+            height: 128,
+            fontColor: 'white',
+            fontSize: 50,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.span(4),
+          y: this.gridY.span(8),
+
+          interactive: true,
+          onpush: function() {
+            this.exit();
+          }.bind(this),
+        },
+        playButton_normal: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'NORMAL',
+            width: 220,
+            height: 128,
+            fontColor: 'white',
+            fontSize: 50,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.span(4),
+          y: this.gridY.span(11),
+
+          interactive: true,
+          onpush: function() {
+            this.exit();
+          }.bind(this),
+        },
+        playButton_hard: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'HARD',
+            width: 220,
+            height: 128,
+            fontColor: 'white',
+            fontSize: 50,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.span(4),
+          y: this.gridY.span(14),
+
+          interactive: true,
+          onpush: function() {
+            this.exit();
+          }.bind(this),
+        },
+      }
+    })
     // タイトル
     Label({
       text: 'Chord Decode',
@@ -438,29 +506,18 @@ phina.define('TitleScene', {
     }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.span(4));
 
 
-    var start_button = Button({
-      width:160,
-      height:160,
-      cornerRadius: 3,
-      backgroundColor: '#aaa',
-      fill: '#fff', //FFF = 白, 000 = 黒
-      text:' '});
-    start_button.setPosition(this.gridX.center(), this.gridY.span(12)).addChildTo(this);
-    /*`
-    var start_btn = Button({
+    /*Label({
       text: "TOUCH START",
       fontSize: 32,
     }).addChildTo(this)
       .setPosition(this.gridX.center(), this.gridY.span(12))
       .tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
     // 画面タッチ時
+    this.on('pointend', function() {
+      // 次のシーンへ
+      this.exit();
+    });
     */
-    start_button.tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
-    start_button.setInteractive(true);
-    this.start_button = start_button;
-    this.start_button.onclick = function(){
-      this.exit;
-    };
     
   },
 });
@@ -469,32 +526,10 @@ phina.define('TitleScene', {
 
 phina.main(function() {
   var app = GameApp({
+    startLabel: location.search.substr(1).toObject().scene || 'title',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     startLabel: 'title',
-    /*
-    scenes: [
-      {
-        className: 'TitleScene',
-        label: 'TitleScene',
-        nextLabel: 'MainScene',
-      },
-      {
-        className: 'OptionScene',
-        label: 'OptionScene',
-        nextLabel: 'TitleScene',
-      },
-      {
-        className: 'MainScene',
-        label: 'MainScene',
-        nextLabel: 'ResultScene',
-      },
-      {
-        className: 'ResultScene',
-        label: 'ResultScene',
-        nextLabel: 'TitleScene',
-      },
-    ]*/
   });
 
   app.enableStats();
