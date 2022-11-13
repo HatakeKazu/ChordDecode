@@ -53,3 +53,23 @@ function calcFreq(index){
   base = 9; //id of A = 9
   return TUNE *  Math.pow(2,(index-9)/12);
 }
+
+function calcScore(correctN){
+  return correctN*score_dif_coef[DIFFICULTY]*score_per_q;
+}
+function calcMessage(correctN,score){
+  dif = ["EASY","NORMAL","HARD"];
+  var scoreThresh = Array(msgList.length);
+  scoreThresh.fill(0);
+  for (let i = 0; i < msgList.length; i++) {
+    scoreThresh[i] = evalScore_init + i*evalScore_rank;
+  }
+  evaluation = msgList[0];
+  for (let i = 0; i < msgList.length; i++) {
+    if(scoreThresh[i] < score){
+      evaluation = msgList[i+1];
+    }
+  }
+  var msg = "難易度{0}で{1}問正解！\n称号：{2}".format(dif[DIFFICULTY],correctN,evaluation);
+  return msg;
+}

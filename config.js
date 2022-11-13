@@ -15,7 +15,7 @@ const BOARD_OFFSET_X  = BOARD_PADDING+40;
 const numbers = [0,2,4,5,7,9,11,12,1,3,6,8,10]; //白鍵を先に配置
 const whitekeys = [0,2,4,5,7,9,11,12];
 const keyLayout_x = [0,1,2,3,4,6,7,8,9,10,11,12,14];
-const keyLayout_y = [6,5,6,5,6,6,5,6,5,6,5,6,6];
+const keyLayout_y = [4,3,4,3,4,4,3,4,3,4,3,4,4];
 
 
 
@@ -50,8 +50,26 @@ var sound_vol = 0.5;
 //ゲーム関係
 
 var DIFFICULTY = -1; //0:easy,1;normal,2:hard
-var TYPE_LIMIT = [2,6,CHORD_TYPE.length]; //difficultyに対応
+const TYPE_LIMIT = [2,6,CHORD_TYPE.length]; //difficultyに対応
 const TIME_LIMIT = 15; //秒数制限でのスコアアタックにしたい
 
+const score_dif_coef = [1.0, 1.5, 2.0];
+const score_per_q = 100;
+var isPPmode = false; //is PerfectPitch mode
 
+const evalScore_init = 100;
+const evalScore_rank = 100;
 
+const msgList = ["かけだしコードニスト"
+            ,"指が慣れてきた"
+            ,"一人前のコード知識"
+            ,"クセになってんだ、構成音考えるの"
+            ,"構成音の申し子"
+            ,"コード完全に理解した"
+            ,"コードマニア"
+            ,"コードは友達"
+            ,"親の顔より見たコード"
+            ,"洗練された理解力"
+            ,"もはや自分自身がコード"
+            ,"人智を超えた構成音力"
+            ,"コード界の神"]

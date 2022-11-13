@@ -44,6 +44,7 @@ phina.define("MainScene", {
 
     //UI関連
     var self = this;
+    this.backgroundColor = 'rgba(20, 200, 20, 0.5)';
     this.group = DisplayElement().addChildTo(this);
     var gridX = Grid(BOARD_SIZE, 16);
     var gridY = Grid(BOARD_SIZE, 8);
@@ -102,13 +103,15 @@ phina.define("MainScene", {
     this._keyUpdate = false; //1個押されたら次のフレームまで他は発火させない
 
     var question = Label('Xm').addChildTo(this);
-    question.setPosition(this.gridX.span(2), this.gridY.span(2));
+    question.fontSize = 74;
+    question.setPosition(this.gridX.center(), this.gridY.span(13));
     question.text = this._tmpChord.name;
     this.question = question;
 
     var bit_db = Label(-1).addChildTo(this);
-    bit_db.setPosition(this.gridX.span(3), this.gridY.span(3));
+    bit_db.setPosition(this.gridX.span(), this.gridY.span(15));
     bit_db.text = this.user_key_bit;
+    bit_db.fontSize = 0;
     this.bit_db = bit_db;
     arr = [];
 
@@ -177,7 +180,10 @@ phina.define("MainScene", {
     // タイマーを更新
     this.time -= app.ticker.deltaTime;
     if(this.time <= 0){
-      this.exit({score: 100});
+      //制限時間終了
+      totalScore = calcScore(this.currentCorrectAnsNum);
+      finalMessage = calcMessage(this.currentCorrectAnsNum,totalScore);
+      this.exit({score: totalScore,message:finalMessage});
     }
     var sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
@@ -308,7 +314,14 @@ phina.define('ResultScene', {
 
     var message = params.message.format(params);
 
-    this.backgroundColor = params.backgroundColor;
+    //this.backgroundColor = params.backgroundColor;
+    if(isPPmode){
+      this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
+    }else{
+      this.backgroundColor = 'hsl(200, 80%, 64%)';
+      
+    }
+    
 
     this.fromJSON({
       children: {
@@ -394,7 +407,7 @@ phina.define('ResultScene', {
     }
 
     this.shareButton.onclick = function() {
-      var text = 'Score: {0}\n{1}'.format(params.score, message);
+      var text = 'SCORE:{0}\n{1}'.format(params.score,params.message);
       var url = phina.social.Twitter.createURL({
         text: text,
         hashtags: params.hashtags,
@@ -430,7 +443,6 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.backgroundColor = 'hsl(200, 80%, 64%)';
-    this.hard_mode = false;
     this.fromJSON({
       children:{
         title: {
@@ -451,14 +463,14 @@ phina.define('TitleScene', {
 
           interactive: true,
           onpush: function() {
-            if(this.hard_mode){
+            if(isPPmode){
               this.backgroundColor = 'hsl(200, 80%, 64%)';
               this.messageLabel.text = "";
             }else{
               this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
               this.messageLabel.text = "絶対音感モード";
             }
-            this.hard_mode = !this.hard_mode;
+            isPPmode = !isPPmode;
             
           }.bind(this),
         },
