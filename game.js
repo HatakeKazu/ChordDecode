@@ -65,7 +65,7 @@ function calcMessage(correctN,score){
     scoreThresh[i] = evalScore_init + i*evalScore_rank;
   }
   evaluation = msgList[0];
-  for (let i = 0; i < msgList.length; i++) {
+  for (let i = 0; i < msgList.length-1; i++) {
     if(scoreThresh[i] < score){
       evaluation = msgList[i+1];
     }

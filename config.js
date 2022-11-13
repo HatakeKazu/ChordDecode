@@ -54,11 +54,11 @@ const TYPE_LIMIT = [2,6,CHORD_TYPE.length]; //difficultyに対応
 const TIME_LIMIT = 15; //秒数制限でのスコアアタックにしたい
 
 const score_dif_coef = [1.0, 1.5, 2.0];
-const score_per_q = 100;
+const score_per_q = 1200;
 var isPPmode = false; //is PerfectPitch mode
 
-const evalScore_init = 100;
-const evalScore_rank = 100;
+const evalScore_init = 1000;
+const evalScore_rank = 1000;
 
 const msgList = ["かけだしコードニスト"
             ,"指が慣れてきた"
