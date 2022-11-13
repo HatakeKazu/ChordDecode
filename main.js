@@ -11,7 +11,7 @@ function correctSound(){
   sec = 0.1;
   
   const osc = audioCtx.createOscillator();
-  osc.frequency.value = 1320*Math.pow(2,5/12);
+  osc.frequency.value = 1326 * Math.pow(2,5/12);
   const gainNode = audioCtx.createGain();
   osc.type = "triangle";
   osc.connect(gainNode);
@@ -22,7 +22,7 @@ function correctSound(){
 
   
   const osc2 = audioCtx.createOscillator();
-  osc2.frequency.value = 1320 * Math.pow(2,1/12);
+  osc2.frequency.value = 1326 * Math.pow(2,1/12);
   const gainNode2 = audioCtx.createGain();
   osc2.type = "sine";
   osc2.connect(gainNode2);
@@ -423,36 +423,6 @@ phina.define('ResultScene', {
 
 });
 
-//設定シーン
-phina.define('OptionScene',{
-  superClass:'DisplayScene',
-  init: function(){
-    this.superInit();
-    //設定
-    var button = Button({
-      width:120,
-      height:120,
-      cornerRadius: 3,
-      backgroundColor: '#aaa',
-      fill: '#fff', //FFF = 白, 000 = 黒
-      text:''});
-    button.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
-    button.onpointstart = function(){
-      alert("huga");
-    };
-    /*
-    let button2 = Button('exit');
-    button2.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
-    button2.onpointstart = function(){
-      this.exit('TiteScene');
-    };
-    */
-  },
-  
-
-
-});
-
 // タイトルシーン
 phina.define('TitleScene', {
   superClass: 'DisplayScene',
@@ -460,21 +430,6 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.backgroundColor = 'hsl(200, 80%, 64%)';
-    
-    //設定
-    var button = Button({
-      width:360,
-      height:360,
-      cornerRadius: 3,
-      backgroundColor: '#aaa',
-      fill: '#fff', //FFF = 白, 000 = 黒
-      text:''});
-    button.setPosition(this.gridX.center(), this.gridY.center(2)).addChildTo(this);
-    button.setInteractive(true);
-    button.onpointstart = function(){
-      this.exit;
-    };
-    
     // タイトル
     Label({
       text: 'Chord Decode',
@@ -482,27 +437,42 @@ phina.define('TitleScene', {
       fill:'white',
     }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.span(4));
 
-    Label({
+
+    var start_button = Button({
+      width:160,
+      height:160,
+      cornerRadius: 3,
+      backgroundColor: '#aaa',
+      fill: '#fff', //FFF = 白, 000 = 黒
+      text:' '});
+    start_button.setPosition(this.gridX.center(), this.gridY.span(12)).addChildTo(this);
+    /*`
+    var start_btn = Button({
       text: "TOUCH START",
       fontSize: 32,
     }).addChildTo(this)
       .setPosition(this.gridX.center(), this.gridY.span(12))
       .tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
     // 画面タッチ時
-    this.on('pointend', function() {
-      // 次のシーンへ
-      this.exit();
-    });
+    */
+    start_button.tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
+    start_button.setInteractive(true);
+    this.start_button = start_button;
+    this.start_button.onclick = function(){
+      this.exit;
+    };
     
-  }
+  },
 });
+
 
 
 phina.main(function() {
   var app = GameApp({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    startLabel: 'TitleScene',
+    startLabel: 'title',
+    /*
     scenes: [
       {
         className: 'TitleScene',
@@ -524,7 +494,7 @@ phina.main(function() {
         label: 'ResultScene',
         nextLabel: 'TitleScene',
       },
-    ]
+    ]*/
   });
 
   app.enableStats();

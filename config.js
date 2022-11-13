@@ -29,7 +29,7 @@ const COMPOSITION = {
   m:[0,3,7],
   7:[0,4,7,10] 
 }
-const TUNE = 442;
+const TUNE = 440;
 const COLOR_WHITE = '#fff';
 const COLOR_BLACK = '#000';
 const COLOR_PRESSED_WHITE = '#a00';
