@@ -148,7 +148,7 @@ phina.define("MainScene", {
     timerLabel.x = 580;
     timerLabel.y = 130;
     timerLabel.fill = '#444';
-    timerLabel.fontSize = 10;
+    timerLabel.fontSize = 50;
     // timerLabel.align = 'right';
     timerLabel.baseline = 'bottom';
     this.timerLabel = timerLabel;
@@ -430,9 +430,38 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.backgroundColor = 'hsl(200, 80%, 64%)';
-    
+    this.hard_mode = false;
     this.fromJSON({
       children:{
+        title: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: 'Chord Decode',
+            width: 1000,
+            height: 128,
+            fontColor: 'black',
+            fontSize: 64,
+            //cornerRadius: 64,
+            fill: 'rgba(240, 240, 240, 1.0)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.center(),
+          y: this.gridY.span(4),
+
+          interactive: true,
+          onpush: function() {
+            if(this.hard_mode){
+              this.backgroundColor = 'hsl(200, 80%, 64%)';
+              this.messageLabel.text = "";
+            }else{
+              this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
+              this.messageLabel.text = "絶対音感モード";
+            }
+            this.hard_mode = !this.hard_mode;
+            
+          }.bind(this),
+        },
         playButton_easy: {
           className: 'phina.ui.Button',
           arguments: [{
@@ -451,6 +480,7 @@ phina.define('TitleScene', {
 
           interactive: true,
           onpush: function() {
+            DIFFICULTY=0;
             this.exit();
           }.bind(this),
         },
@@ -472,6 +502,7 @@ phina.define('TitleScene', {
 
           interactive: true,
           onpush: function() {
+            DIFFICULTY=1;
             this.exit();
           }.bind(this),
         },
@@ -493,11 +524,57 @@ phina.define('TitleScene', {
 
           interactive: true,
           onpush: function() {
+            DIFFICULTY=2;
             this.exit();
           }.bind(this),
         },
+        exprLabel_easy: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: 'メジャーとマイナーの和音のみ',
+            fill: 'white',
+            stroke: null,
+            fontSize: 24,
+          },
+          x: this.gridX.span(11),
+          y: this.gridY.span(8),
+        },
+        exprLabel_normal: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: '一般的に使用される和音群',
+            fill: 'white',
+            stroke: null,
+            fontSize: 24,
+          },
+          x: this.gridX.span(11),
+          y: this.gridY.span(11),
+        },
+        exprLabel_hard: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: 'マニアック和音も含む',
+            fill: 'white',
+            stroke: null,
+            fontSize: 24,
+          },
+          x: this.gridX.span(11),
+          y: this.gridY.span(14),
+        },
+        messageLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: "",
+            fill: 'white',
+            stroke: null,
+            fontSize: 32,
+          },
+          x: this.gridX.center(),
+          y: this.gridY.span(6),
+        },
       }
     })
+    /*
     // タイトル
     Label({
       text: 'Chord Decode',
@@ -505,7 +582,7 @@ phina.define('TitleScene', {
       fill:'white',
     }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.span(4));
 
-
+    */
     /*Label({
       text: "TOUCH START",
       fontSize: 32,

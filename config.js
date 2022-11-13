@@ -24,10 +24,20 @@ const KEY_SCALE       = 12;
 
 const id2Root = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"
               ,"C","D♭","D","E♭","E","F","G♭","G","A♭","A"];
-const CHORD_TYPE = ["","m","7","sus4","m7","M7"];
+const CHORD_TYPE = ["","m","7","sus4","m7","M7","aug","dim","mM7","sus2","add9","6","m6"];
 const COMPOSITION = {
   m:[0,3,7],
-  7:[0,4,7,10] 
+  7:[0,4,7,10],
+  sus4:[0,5,7],
+  m7:[0,3,7,10],
+  M7:[0,4,7,11],
+  aug:[0,4,8],
+  dim:[0,3,6],
+  mM7:[0,3,7,11],
+  sus2:[0,2,7],
+  add9:[0,2,4,7],
+  6:[0,4,7,9],
+  m6:[0,3,7,9]
 }
 const TUNE = 440;
 const COLOR_WHITE = '#fff';
@@ -38,9 +48,10 @@ const SOUND_KEEP = 100; //鳴る時間
 var sound_vol = 0.5;
 
 //ゲーム関係
-const TYPE_LIMIT = 3; //CHORD_TYPE.length; //難易度調整に
-const QUESTION_NUM    = 2;
-const TIME_LIMIT = 10; //秒数制限でのスコアアタックにしたい
+
+var DIFFICULTY = -1; //0:easy,1;normal,2:hard
+var TYPE_LIMIT = [2,6,CHORD_TYPE.length]; //difficultyに対応
+const TIME_LIMIT = 15; //秒数制限でのスコアアタックにしたい
 
 
 

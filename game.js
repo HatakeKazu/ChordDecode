@@ -39,7 +39,7 @@ function nextChord(chord_dict){
     _root = getRandomInt(id2Root.length);
     _root2id = _root % 12;
   }
-  var _type_num = getRandomInt(TYPE_LIMIT);
+  var _type_num = getRandomInt(TYPE_LIMIT[DIFFICULTY]);
   return {
     name:id2Root[_root] + CHORD_TYPE[_type_num],
     key_bit:calcKey_Bit(_root2id,_type_num),
