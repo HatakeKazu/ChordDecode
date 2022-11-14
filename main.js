@@ -54,7 +54,7 @@ phina.define("MainScene", {
     this.audioCtx = audioCtx;
     //音を鳴らす処理(ダミー)
     var oscillator = audioCtx.createOscillator();
-    oscillator.frequency.value = this.myFreq; // value in hertz
+    oscillator.frequency.value = 440; // value in hertz
     var gainNode = audioCtx.createGain();
     gainNode.gain.value = sound_vol;
     oscillator.connect(gainNode);
@@ -62,7 +62,7 @@ phina.define("MainScene", {
     this.oscillator = oscillator;
     this.oscillator.start();
     setTimeout( () => { this.oscillator.stop() }, 100 );
-    
+
     this.keyButtons = [];//後々登録する
 
 
