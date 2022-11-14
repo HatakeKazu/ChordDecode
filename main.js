@@ -50,8 +50,19 @@ phina.define("MainScene", {
     var gridY = Grid(BOARD_SIZE, 8);
     
     //音関連
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.audioCtx = audioCtx;
+    //音を鳴らす処理(ダミー)
+    var oscillator = audioCtx.createOscillator();
+    oscillator.frequency.value = this.myFreq; // value in hertz
+    var gainNode = audioCtx.createGain();
+    gainNode.gain.value = sound_vol;
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    this.oscillator = oscillator;
+    this.oscillator.start();
+    setTimeout( () => { this.oscillator.stop() }, 100 );
+    
     this.keyButtons = [];//後々登録する
 
 
@@ -621,7 +632,7 @@ phina.main(function() {
     startLabel: 'title',
   });
 
-  app.enableStats();
+  //app.enableStats();
 
   app.run();
 });
