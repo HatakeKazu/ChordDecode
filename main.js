@@ -50,7 +50,7 @@ phina.define("MainScene", {
     var gridY = Grid(BOARD_SIZE, 8);
     
     //音関連
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.audioCtx = audioCtx;
     //音を鳴らす処理(ダミー)
     var oscillator = audioCtx.createOscillator();
@@ -433,7 +433,7 @@ phina.define('ResultScene', {
       score: 16,
 
       message: 'this is phina.js project.',
-      hashtags: 'phina_js,game,javascript',
+      //hashtags: 'phina_js,game,javascript',
       url: phina.global.location && phina.global.location.href,
 
       width: 640,
