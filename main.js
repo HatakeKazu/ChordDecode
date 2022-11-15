@@ -188,6 +188,20 @@ phina.define("MainScene", {
 
 
   onenter: function() {
+    var event = "touchstart";
+    var dom = this.app.domElement;
+    dom.addEventListener(event, (function() {
+      return function f() {
+        var context = phina.asset.Sound.getAudioContext();
+        var buf = context.createBuffer(1, 1, 22050);
+        var src = context.createBufferSource();
+        src.buffer = buf;
+        src.connect(context.destination);
+        src.start(0);
+
+        dom.removeEventListener(event, f, false);
+      }
+    }()), false);
     var scene = CountScene({
       backgroundColor: 'rgba(100, 100, 100, 1)',
       count: ['Ready'],
