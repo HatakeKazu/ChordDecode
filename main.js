@@ -188,16 +188,22 @@ phina.define("MainScene", {
 
 
   onenter: function() {
+    //https://qiita.com/pentamania/items/399d133e5440c9424bde
     var event = "touchstart";
+    if (!phina.util.Support.webAudio) {
+      alert('webAudioに対応していません。最新のブラウザを使用して下さい！');
+    }
     var dom = this.app.domElement;
     dom.addEventListener(event, (function() {
       return function f() {
-        var context = phina.asset.Sound.getAudioContext();
-        var buf = context.createBuffer(1, 1, 22050);
-        var src = context.createBufferSource();
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        //var context = phina.asset.Sound.getAudioContext();
+        var buf = audioCtx.createBuffer(1, 1, 22050);
+        var src = audioCtx.createBufferSource();
         src.buffer = buf;
-        src.connect(context.destination);
+        src.connect(audioCtx.destination);
         src.start(0);
+        firstPush = false;
 
         dom.removeEventListener(event, f, false);
       }
