@@ -14,22 +14,24 @@ function correctSound(){
   
   const osc = audioCtx.createOscillator();
   osc.frequency.value = 1326 * Math.pow(2,5/12);
-  const gainNode = audioCtx.createGain();
+  //const gainNode = audioCtx.createGain();
   osc.type = "triangle";
-  osc.connect(gainNode);
-  gainNode.gain.value = sound_vol;
-  gainNode.connect(audioCtx.destination);
+  //osc.connect(gainNode);
+  osc.connect(audioCtx.destination);
+  //gainNode.gain.value = sound_vol;
+  //gainNode.connect(audioCtx.destination);
   osc.start(0);
   osc.stop(audioCtx.currentTime + sec);
 
   
   const osc2 = audioCtx.createOscillator();
   osc2.frequency.value = 1326 * Math.pow(2,1/12);
-  const gainNode2 = audioCtx.createGain();
+  //const gainNode2 = audioCtx.createGain();
   osc2.type = "sine";
-  osc2.connect(gainNode2);
-  gainNode2.gain.value = sound_vol;
-  gainNode2.connect(audioCtx.destination);
+  //osc2.connect(gainNode2);
+  osc2.connect(audioCtx.destination);
+  //gainNode2.gain.value = sound_vol;
+  //gainNode2.connect(audioCtx.destination);
   osc2.start(audioCtx.currentTime + sec);
   osc2.stop(audioCtx.currentTime + sec + sec);
 }
@@ -300,10 +302,11 @@ phina.define('Piano_key',{
       }
       var oscillator = audioCtx.createOscillator();
       oscillator.frequency.value = this.myFreq; // value in hertz
-      var gainNode = audioCtx.createGain();
-      gainNode.gain.value = sound_vol;
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
+      //var gainNode = audioCtx.createGain();
+      //gainNode.gain.value = sound_vol;
+      //oscillator.connect(gainNode);
+      oscillator.connect(audioCtx.destination);
+      //gainNode.connect(audioCtx.destination);
       this.oscillator = oscillator;
       this.oscillator.start();
       setTimeout( () => { this.oscillator.stop() }, 100 );
