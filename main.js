@@ -7,6 +7,8 @@ phina.globalize();
 
 var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
 
+var firstPush = true;
+
 function correctSound(){
   sec = 0.1;
   
@@ -51,8 +53,8 @@ phina.define("MainScene", {
     
     //音関連
     //todo https://stackoverflow.com/questions/46249361/cant-get-web-audio-api-to-work-with-ios-11-safari
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    this.audioCtx = audioCtx;
+    
+    /*
     //音を鳴らす処理(ダミー)
     var oscillator = audioCtx.createOscillator();
     oscillator.frequency.value = 440; // value in hertz
@@ -66,6 +68,7 @@ phina.define("MainScene", {
     }
     this.oscillator.start();
     setTimeout( () => { this.oscillator.stop() }, 100 );
+    */
 
     this.keyButtons = [];//後々登録する
 
@@ -290,6 +293,11 @@ phina.define('Piano_key',{
         this.fill = '#a00';
       }
       //音を鳴らす処理
+      if(firstPush){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        //this.audioCtx = audioCtx;
+        firstPush = false;
+      }
       var oscillator = audioCtx.createOscillator();
       oscillator.frequency.value = this.myFreq; // value in hertz
       var gainNode = audioCtx.createGain();
