@@ -50,6 +50,7 @@ phina.define("MainScene", {
     var gridY = Grid(BOARD_SIZE, 8);
     
     //音関連
+    //todo https://stackoverflow.com/questions/46249361/cant-get-web-audio-api-to-work-with-ios-11-safari
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.audioCtx = audioCtx;
     //音を鳴らす処理(ダミー)
@@ -60,6 +61,9 @@ phina.define("MainScene", {
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     this.oscillator = oscillator;
+    if (audioCtx.state === 'interrupted') {
+      audioCtx.resume();
+    }
     this.oscillator.start();
     setTimeout( () => { this.oscillator.stop() }, 100 );
 
@@ -119,7 +123,7 @@ phina.define("MainScene", {
     question.text = this._tmpChord.name;
     this.question = question;
 
-    var bit_db = Label(-1).addChildTo(this);
+    var bit_db = Label(-1); //.addChildTo(this);
     bit_db.setPosition(this.gridX.span(), this.gridY.span(15));
     bit_db.text = this.user_key_bit;
     bit_db.fontSize = 0;
