@@ -451,6 +451,7 @@ phina.define('TitleScene', {
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
+      //no alert
       //alert(dom);
       dom.addEventListener(event, (function() {
         return function f() {
