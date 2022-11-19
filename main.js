@@ -7,7 +7,7 @@
 phina.globalize();
 
 var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
-var oscillator,oscillator_correct1,oscillator_correct2;
+var oscillator_correct1,oscillator_correct2;
 //var firstPush = true;
 
 function correctSound(){
@@ -51,8 +51,8 @@ phina.define("MainScene", {
     var self = this;
     this.backgroundColor = 'rgba(20, 200, 20, 0.5)';
     this.group = DisplayElement().addChildTo(this);
-    var gridX = Grid(BOARD_SIZE, 16);
-    var gridY = Grid(BOARD_SIZE, 8);
+    let gridX = Grid(BOARD_SIZE, 16);
+    let gridY = Grid(BOARD_SIZE, 8);
     
     //音関連
     //todo https://stackoverflow.com/questions/46249361/cant-get-web-audio-api-to-work-with-ios-11-safari
@@ -207,7 +207,7 @@ phina.define("MainScene", {
       let finalMessage = calcMessage(this.currentCorrectAnsNum,totalScore);
       this.exit({score: totalScore,message:finalMessage});
     }
-    var sec = this.time/1000; // 秒数に変換
+    let sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
     this._keyUpdate = false;
   },
@@ -284,12 +284,12 @@ phina.define('Piano_key',{
       }else{
         this.fill = '#a00';
       }
-      oscillator = audioCtx.createOscillator();
+      let oscillator = audioCtx.createOscillator();
       oscillator.frequency.value = this.myFreq; // value in hertz
       oscillator.connect(audioCtx.destination);
-      //this.oscillator = oscillator;
-      oscillator.start();
-      setTimeout( () => { oscillator.stop() }, 100 );
+      this.oscillator = oscillator;
+      this.oscillator.start();
+      setTimeout( () => { this.oscillator.stop() }, 100 );
     }
     this.active = !this.active;
   },
@@ -318,7 +318,7 @@ phina.define('ResultScene', {
 
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
 
-    var message = params.message.format(params);
+    let message = params.message.format(params);
 
     //this.backgroundColor = params.backgroundColor;
     if(isPPmode){
@@ -413,8 +413,8 @@ phina.define('ResultScene', {
     }
 
     this.shareButton.onclick = function() {
-      var text = 'SCORE:{0}\n{1}'.format(params.score,params.message);
-      var url = phina.social.Twitter.createURL({
+      let text = 'SCORE:{0}\n{1}'.format(params.score,params.message);
+      let url = phina.social.Twitter.createURL({
         text: text,
         hashtags: '',
         url: params.url,
@@ -449,20 +449,14 @@ phina.define('TitleScene', {
   init: function() {
     this.superInit();
     this.on('enter', function() {
-      var event = "click"; //"touchstart";
-      var dom = this.app.domElement;
+      let event = "touchstart"; //for iPhone
+      let dom = this.app.domElement;
+      alert(dom);
       dom.addEventListener(event, (function() {
         return function f() {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
-          //alert("a2");
-          /*var buf = audioCtx.createBuffer(1, 1, 22050);
-          var src = audioCtx.createBufferSource();
-          src.buffer = buf;
-          src.connect(audioCtx.destination);
-          src.start(0);
-          */
-          
-          var oscillator = audioCtx.createOscillator();
+          alert("active by iOS");
+          let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           oscillator.connect(audioCtx.destination);
           this.oscillator = oscillator;
@@ -473,9 +467,26 @@ phina.define('TitleScene', {
         }
       }()), false);
 
+      let event2 = "click"; // for PC
+      dom.addEventListener(event2, (function() {
+        return function f() {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
+          alert("active by PC");
+          let oscillator = audioCtx.createOscillator();
+          oscillator.frequency.value = 440; // value in hertz
+          oscillator.connect(audioCtx.destination);
+          this.oscillator = oscillator;
+          this.oscillator.start();
+          setTimeout( () => { this.oscillator.stop() }, 100 );
+
+          dom.removeEventListener(event2, f, false);
+        }
+      }()), false);
+
       // シーン遷移
       this.on('pointend', function() {
       });
+
     });
 
     this.backgroundColor = 'hsl(200, 80%, 64%)';
@@ -649,7 +660,7 @@ phina.define('TitleScene', {
 
 
 phina.main(function() {
-  var app = GameApp({
+  let app = GameApp({
     startLabel: location.search.substr(1).toObject().scene || 'title',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
