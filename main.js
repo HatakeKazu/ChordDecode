@@ -451,12 +451,9 @@ phina.define('TitleScene', {
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
-      //no alert
-      //alert(dom);
       dom.addEventListener(event, (function() {
         return function f() {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
-          //alert("active by iOS");
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           oscillator.connect(audioCtx.destination);
@@ -472,7 +469,6 @@ phina.define('TitleScene', {
       dom.addEventListener(event2, (function() {
         return function f() {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
-          //alert("active by PC");
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           oscillator.connect(audioCtx.destination);
@@ -516,7 +512,7 @@ phina.define('TitleScene', {
               this.messageLabel.text = "";
             }else{
               this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
-              this.messageLabel.text = "絶対音感モード";
+              this.messageLabel.text = "絶対音感用モード";
             }
             isPPmode = !isPPmode;
             
