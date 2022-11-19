@@ -451,11 +451,11 @@ phina.define('TitleScene', {
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
-      alert(dom);
+      //alert(dom);
       dom.addEventListener(event, (function() {
         return function f() {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
-          alert("active by iOS");
+          //alert("active by iOS");
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           oscillator.connect(audioCtx.destination);
@@ -471,7 +471,7 @@ phina.define('TitleScene', {
       dom.addEventListener(event2, (function() {
         return function f() {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
-          alert("active by PC");
+          //alert("active by PC");
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           oscillator.connect(audioCtx.destination);

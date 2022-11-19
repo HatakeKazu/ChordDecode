@@ -45,7 +45,7 @@ const COLOR_BLACK = '#000';
 const COLOR_PRESSED_WHITE = '#a00';
 const COLOR_PRESSED_BLACK = '#a00';
 const SOUND_KEEP = 100; //鳴る時間
-var sound_vol = 1.0;
+var sound_vol = 0.3;
 
 //ゲーム関係
 
