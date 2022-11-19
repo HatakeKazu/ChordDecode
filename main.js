@@ -2,6 +2,7 @@
  * Runstant
  * 思いたったらすぐ開発. プログラミングに革命を...
  */
+"use strict";
 
 phina.globalize();
 
@@ -10,7 +11,7 @@ var oscillator,oscillator_correct1,oscillator_correct2;
 //var firstPush = true;
 
 function correctSound(){
-  sec = 0.1;
+  let sec = 0.1;
   
   oscillator_correct1 = audioCtx.createOscillator();
   oscillator_correct1.frequency.value = 1326 * Math.pow(2,5/12);
@@ -133,7 +134,7 @@ phina.define("MainScene", {
     bit_db.text = this.user_key_bit;
     bit_db.fontSize = 0;
     this.bit_db = bit_db;
-    arr = [];
+    var arr = [];
 
     numbers.each(function(index, i) { //index = 中身 i = enumerate的なやつ
       // グリッド上でのインデックス
@@ -202,8 +203,8 @@ phina.define("MainScene", {
     this.time -= app.ticker.deltaTime;
     if(this.time <= 0){
       //制限時間終了
-      totalScore = calcScore(this.currentCorrectAnsNum);
-      finalMessage = calcMessage(this.currentCorrectAnsNum,totalScore);
+      let totalScore = calcScore(this.currentCorrectAnsNum);
+      let finalMessage = calcMessage(this.currentCorrectAnsNum,totalScore);
       this.exit({score: totalScore,message:finalMessage});
     }
     var sec = this.time/1000; // 秒数に変換
