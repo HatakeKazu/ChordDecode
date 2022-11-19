@@ -6,34 +6,34 @@
 phina.globalize();
 
 var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
-
-var firstPush = true;
+var oscillator,oscillator_correct1,oscillator_correct2;
+//var firstPush = true;
 
 function correctSound(){
   sec = 0.1;
   
-  const osc = audioCtx.createOscillator();
-  osc.frequency.value = 1326 * Math.pow(2,5/12);
+  oscillator_correct1 = audioCtx.createOscillator();
+  oscillator_correct1.frequency.value = 1326 * Math.pow(2,5/12);
   //const gainNode = audioCtx.createGain();
-  osc.type = "triangle";
+  oscillator_correct1.type = "triangle";
   //osc.connect(gainNode);
-  osc.connect(audioCtx.destination);
+  oscillator_correct1.connect(audioCtx.destination);
   //gainNode.gain.value = sound_vol;
   //gainNode.connect(audioCtx.destination);
-  osc.start(0);
-  osc.stop(audioCtx.currentTime + sec);
+  oscillator_correct1.start(0);
+  oscillator_correct1.stop(audioCtx.currentTime + sec);
 
   
-  const osc2 = audioCtx.createOscillator();
-  osc2.frequency.value = 1326 * Math.pow(2,1/12);
+  oscillator_correct2 = audioCtx.createOscillator();
+  oscillator_correct2.frequency.value = 1326 * Math.pow(2,1/12);
   //const gainNode2 = audioCtx.createGain();
-  osc2.type = "sine";
+  oscillator_correct2.type = "sine";
   //osc2.connect(gainNode2);
-  osc2.connect(audioCtx.destination);
+  oscillator_correct2.connect(audioCtx.destination);
   //gainNode2.gain.value = sound_vol;
   //gainNode2.connect(audioCtx.destination);
-  osc2.start(audioCtx.currentTime + sec);
-  osc2.stop(audioCtx.currentTime + sec + sec);
+  oscillator_correct2.start(audioCtx.currentTime + sec);
+  oscillator_correct2.stop(audioCtx.currentTime + sec + sec);
 }
 
 
@@ -188,26 +188,7 @@ phina.define("MainScene", {
 
 
   onenter: function() {
-    //https://qiita.com/pentamania/items/399d133e5440c9424bde
-    var event = "touchstart";
-    if (!phina.util.Support.webAudio) {
-      alert('webAudioに対応していません。最新のブラウザを使用して下さい！');
-    }
-    var dom = this.app.domElement;
-    dom.addEventListener(event, (function() {
-      return function f() {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        //var context = phina.asset.Sound.getAudioContext();
-        var buf = audioCtx.createBuffer(1, 1, 22050);
-        var src = audioCtx.createBufferSource();
-        src.buffer = buf;
-        src.connect(audioCtx.destination);
-        src.start(0);
-        firstPush = false;
-
-        dom.removeEventListener(event, f, false);
-      }
-    }()), false);
+    
     var scene = CountScene({
       backgroundColor: 'rgba(100, 100, 100, 1)',
       count: ['Ready'],
@@ -263,18 +244,6 @@ phina.define("MainScene", {
       this.bit_db.text = this.user_key_bit;
       
     }
-    /*
-    //規定問題数で終了の名残
-    if (this.currentCorrectAnsNum == QUESTION_NUM) {
-      this.exit({
-        score: 100,
-      });
-    }
-    else {
-      this.currentIndex += 1;
-    }
-    */
-    
   }
 
 });
@@ -314,22 +283,12 @@ phina.define('Piano_key',{
       }else{
         this.fill = '#a00';
       }
-      //音を鳴らす処理
-      if(firstPush){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        //this.audioCtx = audioCtx;
-        firstPush = false;
-      }
-      var oscillator = audioCtx.createOscillator();
+      oscillator = audioCtx.createOscillator();
       oscillator.frequency.value = this.myFreq; // value in hertz
-      //var gainNode = audioCtx.createGain();
-      //gainNode.gain.value = sound_vol;
-      //oscillator.connect(gainNode);
       oscillator.connect(audioCtx.destination);
-      //gainNode.connect(audioCtx.destination);
-      this.oscillator = oscillator;
-      this.oscillator.start();
-      setTimeout( () => { this.oscillator.stop() }, 100 );
+      //this.oscillator = oscillator;
+      oscillator.start();
+      setTimeout( () => { oscillator.stop() }, 100 );
     }
     this.active = !this.active;
   },
@@ -456,7 +415,7 @@ phina.define('ResultScene', {
       var text = 'SCORE:{0}\n{1}'.format(params.score,params.message);
       var url = phina.social.Twitter.createURL({
         text: text,
-        hashtags: params.hashtags,
+        hashtags: '',
         url: params.url,
       });
       window.open(url, 'share window', 'width=480, height=320');
@@ -468,7 +427,7 @@ phina.define('ResultScene', {
       score: 16,
 
       message: 'this is phina.js project.',
-      //hashtags: 'phina_js,game,javascript',
+      hashtags: 'chord',
       url: phina.global.location && phina.global.location.href,
 
       width: 640,
@@ -488,6 +447,36 @@ phina.define('TitleScene', {
   // コンストラクタ
   init: function() {
     this.superInit();
+    this.on('enter', function() {
+      var event = "click"; //"touchstart";
+      var dom = this.app.domElement;
+      dom.addEventListener(event, (function() {
+        return function f() {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
+          //alert("a2");
+          /*var buf = audioCtx.createBuffer(1, 1, 22050);
+          var src = audioCtx.createBufferSource();
+          src.buffer = buf;
+          src.connect(audioCtx.destination);
+          src.start(0);
+          */
+          
+          var oscillator = audioCtx.createOscillator();
+          oscillator.frequency.value = 440; // value in hertz
+          oscillator.connect(audioCtx.destination);
+          this.oscillator = oscillator;
+          this.oscillator.start();
+          setTimeout( () => { this.oscillator.stop() }, 100 );
+
+          dom.removeEventListener(event, f, false);
+        }
+      }()), false);
+
+      // シーン遷移
+      this.on('pointend', function() {
+      });
+    });
+
     this.backgroundColor = 'hsl(200, 80%, 64%)';
     this.fromJSON({
       children:{
@@ -653,7 +642,6 @@ phina.define('TitleScene', {
       this.exit();
     });
     */
-    
   },
 });
 
@@ -667,7 +655,7 @@ phina.main(function() {
     startLabel: 'title',
   });
 
-  //app.enableStats();
+  app.enableStats();
 
   app.run();
 });
