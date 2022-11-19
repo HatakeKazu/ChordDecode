@@ -512,7 +512,7 @@ phina.define('TitleScene', {
               this.messageLabel.text = "";
             }else{
               this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
-              this.messageLabel.text = "絶対音感用モード";
+              this.messageLabel.text = "絶対音感用モード\n工事中";
             }
             isPPmode = !isPPmode;
             
