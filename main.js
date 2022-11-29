@@ -82,7 +82,7 @@ function stopTmpChord(osc_bag){
     let endTime = startTime + 2 * FADE_OUT_SEC;
     element[1].gain.linearRampToValueAtTime(SOUND_VOLUME, startTime);
     element[1].gain.linearRampToValueAtTime(0, endTime);
-    setTimeout( () => { element[0].stop() }, 100);
+    //setTimeout( () => { element[0].stop() }, 100);
     //element[0].stop(endTime  + 4 * FADE_OUT_SEC);
     //element[0].stop(startTime + FADE_OUT_SEC);
   });
@@ -184,7 +184,7 @@ phina.define("MainScene", {
     }else{
       _q_col = BG_COLOR_BASIC;
     }
-    var question = Button({text:"Xm",fill:_q_col,width:BTNSIZE_L_W,height:BTNSIZE_L_H,fontSize:FONTSIZE_M}).addChildTo(this);
+    var question = Button({text:"",fill:_q_col,width:BTNSIZE_L_W,height:BTNSIZE_L_H,fontSize:FONTSIZE_M}).addChildTo(this);
     
     question.setInteractive(true);
     question.onpointstart = function(){
@@ -211,7 +211,6 @@ phina.define("MainScene", {
     this.bit_db = bit_db;
     var arr = [];
 
-    alert("new piano");
     numbers.each(function(index, i) { //index = 中身 i = enumerate的なやつ 白鍵から配置する
       // グリッド上でのインデックス
 
@@ -352,6 +351,10 @@ phina.define('Piano_key',{
     this.active = false;
     this.isBlack = isBlack;
     this.myFreq = calcFreq(index);
+    this.fill_c = FILL_COLOR_BASIC;
+    if(isPPmode){
+      this.fill_c = FILL_COLOR_PP;
+    }
     
   },
   pushed: function(){
@@ -363,9 +366,9 @@ phina.define('Piano_key',{
       }
     }else{ //押されてない状態から押された
       if(this.isBlack){
-        this.fill = '#a00';
+        this.fill = this.fill_c;
       }else{
-        this.fill = '#a00';
+        this.fill = this.fill_c;
       }
       
       let oscillator = audioCtx.createOscillator();
@@ -374,13 +377,13 @@ phina.define('Piano_key',{
       oscillator.frequency.value = this.myFreq; // value in hertz
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      this.oscillator = oscillator;
-      this.oscillator.start();
+      oscillator.start();
       let startTime = audioCtx.currentTime;
       let endTime = startTime + FADE_OUT_SEC;
       gainNode.gain.setValueAtTime(SOUND_VOLUME, startTime);
       gainNode.gain.linearRampToValueAtTime(0, endTime);
-      this.oscillator.stop(startTime + SOUND_KEEP_SEC + FADE_OUT_SEC);
+      oscillator.stop(startTime + SOUND_KEEP_SEC + FADE_OUT_SEC);
+      
       //setTimeout( () => { this.oscillator.stop() }, 1000*SOUND_KEEP_SEC + 1000*FADE_OUT_SEC);
     }
     this.active = !this.active;
@@ -452,7 +455,7 @@ phina.define('ResultScene', {
             text: message,
             fill: params.fontColor,
             stroke: null,
-            fontSize: FONTSIZE_M,
+            fontSize: FONTSIZE_MS,
             lineHeight: 1.5
           },
           x: this.gridX.center(),
@@ -576,18 +579,16 @@ phina.define('TitleScene', {
         return function f() {
           if(audioCtx == null){
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          }else{
-            alert("reuse ctx");
           }
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           let gainNode = audioCtx.createGain();
-          gainNode.gain.value = SOUND_VOLUME*0;
+          gainNode.gain.value = SOUND_VOLUME*0.00;
           oscillator.connect(gainNode);
           gainNode.connect(audioCtx.destination);
-          this.oscillator = oscillator;
-          this.oscillator.start();
-          setTimeout( () => { this.oscillator.stop() }, 100);
+          
+          oscillator.start();
+          oscillator.stop(audioCtx.currentTime + 0.01);
           dom.removeEventListener(event, f, false);
         }
       }()), false);
@@ -595,16 +596,18 @@ phina.define('TitleScene', {
       let event2 = "click"; // for PC
       dom.addEventListener(event2, (function() {
         return function f() {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
+          if(audioCtx == null){
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
           let gainNode = audioCtx.createGain();
-          gainNode.gain.value = SOUND_VOLUME*0;
+          gainNode.gain.value = SOUND_VOLUME*0.00;
           oscillator.connect(gainNode);
           gainNode.connect(audioCtx.destination);
-          this.oscillator = oscillator;
-          this.oscillator.start();
-          setTimeout( () => { this.oscillator.stop() }, 100);
+          oscillator = oscillator;
+          oscillator.start();
+          oscillator.stop(audioCtx.currentTime + 0.01);
           dom.removeEventListener(event, f, false);
         }
       }()), false);
@@ -803,7 +806,7 @@ phina.main(function() {
     startLabel: 'title',
   });
 
-  app.enableStats();
+  //app.enableStats();
 
   app.run();
 });

@@ -58,7 +58,11 @@ function calcFreq(index){
 }
 
 function calcScore(correctN){
-  return correctN*score_dif_coef[DIFFICULTY]*score_per_q;
+  let _coef = 1.0;
+  if(isPPmode){
+    _coef = 2.0;
+  }
+  return _coef * correctN*score_dif_coef[DIFFICULTY]*score_per_q;
 }
 function calcMessage(correctN,score){
   dif = ["EASY","NORMAL","HARD"];
@@ -73,7 +77,11 @@ function calcMessage(correctN,score){
       evaluation = msgList[i+1];
     }
   }
-  var msg = "難易度{0}で{1}問正解！\n称号：{2}".format(dif[DIFFICULTY],correctN,evaluation);
+  let _oni='';
+  if(isPPmode){
+    _oni = '【鬼】'
+  }
+  var msg = "難易度{0}{1}で{2}問正解！\n称号：{3}".format(dif[DIFFICULTY],_oni,correctN,evaluation);
   return msg;
 }
 

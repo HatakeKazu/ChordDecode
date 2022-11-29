@@ -36,12 +36,13 @@
 ・1音目が鳴らないことがある
 ・android readyは絶対ならない
 
-・タイマーの配置
 
 
 ・鍵盤の隙間を開ける
 
 【DONE】
+
+・タイマーの配置
 ・tweet retryの配置 (tweetアイコン）
 ・restartは難易度同じで　topに戻る
 

@@ -19,7 +19,8 @@ const BOARD_SIZE      = SCREEN_WIDTH - BOARD_PADDING*2;
 const BOARD_OFFSET_X  = BOARD_PADDING+40;
 
 const FONTSIZE_L = SCREEN_WIDTH * 0.13;
-const FONTSIZE_M = SCREEN_WIDTH * 0.07;
+const FONTSIZE_M = SCREEN_WIDTH * 0.065;
+const FONTSIZE_MS = SCREEN_WIDTH * 0.04;
 const FONTSIZE_S = SCREEN_WIDTH * 0.03;
 
 const BTNSIZE_M_W = SCREEN_WIDTH * 0.4;
@@ -60,6 +61,9 @@ for (let i = 0; i < 13; i++) {//左から右へ
 const BG_COLOR_BASIC = 'hsl(200, 80%, 64%)';
 const BG_COLOR_PP = 'rgba(200, 24, 24, 1.0)';
 const BG_COLOR_TITLE = 'hsl(200, 80%, 64%)';
+
+const FILL_COLOR_BASIC = 'rgba(200, 24, 24, 1.0)';
+const FILL_COLOR_PP = 'hsl(200, 80%, 64%)';
 
 //ピアノ定義
 const KEY_SCALE       = 12;
