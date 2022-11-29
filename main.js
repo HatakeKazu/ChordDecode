@@ -32,7 +32,7 @@ function correctSound(){
   let gainNode2 = audioCtx.createGain();
   oscillator_correct2.type = "sine";
   oscillator_correct2.connect(gainNode2);
-  gainNode2.gain.value = SOUND_VOLUME*0.1;
+  gainNode2.gain.value = SOUND_VOLUME*0.0;
   gainNode2.connect(audioCtx.destination);
   oscillator_correct2.start(audioCtx.currentTime + sec);
   oscillator_correct2.stop(audioCtx.currentTime + sec + sec);
