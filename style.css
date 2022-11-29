@@ -4,9 +4,10 @@
 html {
   font-size: 62.5%;
 }
+
 body {
   color: #444;
-  background-color: hsl(0, 0%, 96%);
+  background-color: hsl(0, 0%, 81%);
 }
 h1 {
   font-size: 1.8rem;

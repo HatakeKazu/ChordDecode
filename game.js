@@ -39,7 +39,10 @@ function nextChord(chord_dict){
     _root = getRandomInt(id2Root.length);
     _root2id = _root % 12;
   }
-  var _type_num = getRandomInt(TYPE_LIMIT[DIFFICULTY]);
+  var _type_num = getRandomInt(TYPE_LIMIT_END[DIFFICULTY]);
+  while(_type_num<TYPE_LIMIT_BEGIN[DIFFICULTY]){
+    var _type_num = getRandomInt(TYPE_LIMIT_END[DIFFICULTY]);
+  }
   return {
     name:id2Root[_root] + CHORD_TYPE[_type_num],
     key_bit:calcKey_Bit(_root2id,_type_num),
@@ -72,4 +75,26 @@ function calcMessage(correctN,score){
   }
   var msg = "難易度{0}で{1}問正解！\n称号：{2}".format(dif[DIFFICULTY],correctN,evaluation);
   return msg;
+}
+
+function randint(a,b){
+  //[a,b)
+  return Math.floor(Math.random() * (b - a) + a);
+}
+
+function calcRanking(score){
+  let _population = POPULATION;
+  let udemae = [0.00001,0.00003,0.00006,0.00009];
+  let rank = -1;
+  if(score > score_top30){
+    rank = randint(1,_population*udemae[0]);
+  }else if(score > score_top60){
+    rank = randint(_population*udemae[0],_population*udemae[1]);
+  }else if(score > score_top90){
+    rank = randint(_population*udemae[1],_population*udemae[2]);
+  }else{
+    rank = randint(_population*udemae[2],_population*udemae[3]);
+  }
+
+  return rank + '位'; 
 }

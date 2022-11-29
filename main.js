@@ -6,8 +6,11 @@
 
 phina.globalize();
 
-var audioCtx; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
+var audioCtx=null; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
 var oscillator_correct1,oscillator_correct2;
+var oscillator_chords = [];
+var _tmpChord;
+var _chordPush = 0;
 //var firstPush = true;
 
 function correctSound(){
@@ -15,28 +18,76 @@ function correctSound(){
   
   oscillator_correct1 = audioCtx.createOscillator();
   oscillator_correct1.frequency.value = 1326 * Math.pow(2,5/12);
-  //const gainNode = audioCtx.createGain();
+  let gainNode = audioCtx.createGain();
   oscillator_correct1.type = "triangle";
-  //osc.connect(gainNode);
-  oscillator_correct1.connect(audioCtx.destination);
-  //gainNode.gain.value = sound_vol;
-  //gainNode.connect(audioCtx.destination);
-  oscillator_correct1.start(0);
+  oscillator_correct1.connect(gainNode);
+  gainNode.gain.value = SOUND_VOLUME;
+  gainNode.connect(audioCtx.destination);
+  oscillator_correct1.start();
   oscillator_correct1.stop(audioCtx.currentTime + sec);
 
   
   oscillator_correct2 = audioCtx.createOscillator();
   oscillator_correct2.frequency.value = 1326 * Math.pow(2,1/12);
-  //const gainNode2 = audioCtx.createGain();
+  let gainNode2 = audioCtx.createGain();
   oscillator_correct2.type = "sine";
-  //osc2.connect(gainNode2);
-  oscillator_correct2.connect(audioCtx.destination);
-  //gainNode2.gain.value = sound_vol;
-  //gainNode2.connect(audioCtx.destination);
+  oscillator_correct2.connect(gainNode2);
+  gainNode2.gain.value = SOUND_VOLUME;
+  gainNode2.connect(audioCtx.destination);
   oscillator_correct2.start(audioCtx.currentTime + sec);
   oscillator_correct2.stop(audioCtx.currentTime + sec + sec);
 }
 
+function playTmpChord(osc_bag){
+  let chordFreqs = [];
+  //chordFreqs.push(calcFreq(_tmpChord.root));
+  let composIds;
+  if(_tmpChord.type == 0){
+    composIds = [0,4,7];
+  }else{
+    composIds = COMPOSITION[CHORD_TYPE[_tmpChord.type]];
+  }
+  composIds.forEach(function(element){
+    chordFreqs.push(calcFreq(_tmpChord.root + element));
+  });
+  /*
+  let oscillator = audioCtx.createOscillator();
+  oscillator.frequency.value = chordFreqs[_playComposX % chordFreqs.length]; // value in hertz
+  let gainNode = audioCtx.createGain();
+  gainNode.gain.value = SOUND_VOLUME;
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  oscillator.start();
+  osc_bag.push([oscillator,gainNode]);
+  */
+  
+  chordFreqs.forEach(function(element){
+    let oscillator = audioCtx.createOscillator();
+    oscillator.frequency.value = element; // value in hertz
+    let gainNode = audioCtx.createGain();
+    gainNode.gain.value = SOUND_VOLUME;
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    //setTimeout( () => { oscillator.start(); },0);
+    oscillator.start();
+    osc_bag.push([oscillator,gainNode]);
+  });
+  return osc_bag;
+}
+
+function stopTmpChord(osc_bag){
+  osc_bag.forEach(function(element){ //element = [(osillator,gainNode),(oscillator,gainNode),...]
+    let startTime = audioCtx.currentTime;
+    let endTime = startTime + 2 * FADE_OUT_SEC;
+    element[1].gain.linearRampToValueAtTime(SOUND_VOLUME, startTime);
+    element[1].gain.linearRampToValueAtTime(0, endTime);
+    setTimeout( () => { element[0].stop() }, 100);
+    //element[0].stop(endTime  + 4 * FADE_OUT_SEC);
+    //element[0].stop(startTime + FADE_OUT_SEC);
+  });
+  return [];
+}
 
 phina.define("MainScene", {
   superClass: 'DisplayScene',
@@ -49,10 +100,13 @@ phina.define("MainScene", {
 
     //UI関連
     var self = this;
-    this.backgroundColor = 'rgba(20, 200, 20, 0.5)';
+    if(isPPmode){
+      this.backgroundColor = BG_COLOR_PP;
+    }else{
+      this.backgroundColor = BG_COLOR_BASIC;
+    }
+    
     this.group = DisplayElement().addChildTo(this);
-    let gridX = Grid(BOARD_SIZE, 16);
-    let gridY = Grid(BOARD_SIZE, 8);
     
     //音関連
     //todo https://stackoverflow.com/questions/46249361/cant-get-web-audio-api-to-work-with-ios-11-safari
@@ -118,16 +172,37 @@ phina.define("MainScene", {
                     root:currentChord_root,
                     type:currentChord_type};
     
-    this._tmpChord = nextChord(firstChord);
-    this.currentChord_key_bit = this._tmpChord.key_bit;
+    _tmpChord = nextChord(firstChord);
+    this.currentChord_key_bit = _tmpChord.key_bit;
     
     this._keyUpdate = false; //1個押されたら次のフレームまで他は発火させない
 
-    var question = Label('Xm').addChildTo(this);
-    question.fontSize = 74;
-    question.setPosition(this.gridX.center(), this.gridY.span(13));
-    question.text = this._tmpChord.name;
+    //var question = Label('Xm').addChildTo(this);
+    let _q_col;
+    if(isPPmode){
+      _q_col = BG_COLOR_PP;
+    }else{
+      _q_col = BG_COLOR_BASIC;
+    }
+    var question = Button({text:"Xm",fill:_q_col,width:BTNSIZE_L_W,height:BTNSIZE_L_H,fontSize:FONTSIZE_M}).addChildTo(this);
+    
+    question.setInteractive(true);
+    question.onpointstart = function(){
+      oscillator_chords = playTmpChord(oscillator_chords);
+      _chordPush += 1;
+    };
+    question.onpointend = function(){
+      stopTmpChord(oscillator_chords);
+      oscillator_chords = [];
+      _chordPush -= 1;
+    };
+    question.fontSize = FONTSIZE_L;
+    question.setPosition(SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.9);
+    question.text = _tmpChord.name;
     this.question = question;
+    if(isPPmode){
+      this.question.text = "???";
+    }
 
     var bit_db = Label(-1); //.addChildTo(this);
     bit_db.setPosition(this.gridX.span(), this.gridY.span(15));
@@ -136,25 +211,26 @@ phina.define("MainScene", {
     this.bit_db = bit_db;
     var arr = [];
 
-    numbers.each(function(index, i) { //index = 中身 i = enumerate的なやつ
+    alert("new piano");
+    numbers.each(function(index, i) { //index = 中身 i = enumerate的なやつ 白鍵から配置する
       // グリッド上でのインデックス
-      var xIndex = keyLayout_x[index];
-      var yIndex = keyLayout_y[index];
+
       var col = '#000';
-      var height = 190;
-      var width = BLACKLEY_WIDTH;
+      var height = BLACKKEY_HEIGHT;
+      var width = BLACKKEY_WIDTH;
       var isBlack = true;
       if(whitekeys.includes(index)){
         col = '#fff';
-        height = 345;
+        height = WHITEKEY_HEIGHT;
         width = WHITEKEY_WIDTH;
         isBlack = false;
       }
       
       var p = Piano_key(index,col,width,height,isBlack).addChildTo(self.group);
       arr.push(p);
-      p.x = gridX.span(xIndex)+BOARD_OFFSET_X;
-      p.y = gridY.span(yIndex)+150;
+      p.setOrigin(0,0)
+      p.x = KeysPosition_x[index];
+      p.y = KeysPosition_y[index];
 
       p.onpointstart = function() {
         if(!self._keyUpdate){
@@ -169,10 +245,10 @@ phina.define("MainScene", {
     // タイマーラベルを生成
     var timerLabel = Label('0').addChildTo(this);
     timerLabel.origin.x = 1;
-    timerLabel.x = 580;
-    timerLabel.y = 130;
+    timerLabel.x = SCREEN_WIDTH * 0.92;
+    timerLabel.y = SCREEN_HEIGHT * 0.05;
     timerLabel.fill = '#444';
-    timerLabel.fontSize = 50;
+    timerLabel.fontSize = FONTSIZE_S;
     // timerLabel.align = 'right';
     timerLabel.baseline = 'bottom';
     this.timerLabel = timerLabel;
@@ -194,6 +270,8 @@ phina.define("MainScene", {
       backgroundColor: 'rgba(100, 100, 100, 1)',
       count: ['Ready'],
       fontSize: 100,
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
     });
     this.app.pushScene(scene);
   },
@@ -205,6 +283,9 @@ phina.define("MainScene", {
       //制限時間終了
       let totalScore = calcScore(this.currentCorrectAnsNum);
       let finalMessage = calcMessage(this.currentCorrectAnsNum,totalScore);
+      oscillator_chords = stopTmpChord(oscillator_chords);
+      audioCtx = null;
+      this.keyButtons = null;
       this.exit({score: totalScore,message:finalMessage});
     }
     let sec = this.time/1000; // 秒数に変換
@@ -239,9 +320,12 @@ phina.define("MainScene", {
       });
 
       //次の準備
-      this._tmpChord = nextChord(this._tmpChord)
-      this.currentChord_key_bit = this._tmpChord.key_bit;
-      this.question.text = this._tmpChord.name;
+      _tmpChord = nextChord(_tmpChord)
+      this.currentChord_key_bit = _tmpChord.key_bit;
+      this.question.text = _tmpChord.name;
+      if(isPPmode){
+        this.question.text = "???";
+      }
       this.bit_db.text = this.user_key_bit;
       
     }
@@ -258,7 +342,7 @@ phina.define('Piano_key',{
     this.superInit({
       width:width,
       height:height,
-      cornerRadius: 3,
+      cornerRadius: 2,
       backgroundColor: '#aaa',
       fill: my_color, //FFF = 白, 000 = 黒
       text:'',
@@ -267,7 +351,6 @@ phina.define('Piano_key',{
     this.index = index;
     this.active = false;
     this.isBlack = isBlack;
-    this.freq = calcFreq(index);
     this.myFreq = calcFreq(index);
     
   },
@@ -284,12 +367,21 @@ phina.define('Piano_key',{
       }else{
         this.fill = '#a00';
       }
+      
       let oscillator = audioCtx.createOscillator();
+      let gainNode = audioCtx.createGain();
+      gainNode.gain.value = SOUND_VOLUME;
       oscillator.frequency.value = this.myFreq; // value in hertz
-      oscillator.connect(audioCtx.destination);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
       this.oscillator = oscillator;
       this.oscillator.start();
-      setTimeout( () => { this.oscillator.stop() }, 100 );
+      let startTime = audioCtx.currentTime;
+      let endTime = startTime + FADE_OUT_SEC;
+      gainNode.gain.setValueAtTime(SOUND_VOLUME, startTime);
+      gainNode.gain.linearRampToValueAtTime(0, endTime);
+      this.oscillator.stop(startTime + SOUND_KEEP_SEC + FADE_OUT_SEC);
+      //setTimeout( () => { this.oscillator.stop() }, 1000*SOUND_KEEP_SEC + 1000*FADE_OUT_SEC);
     }
     this.active = !this.active;
   },
@@ -301,8 +393,8 @@ phina.define('Piano_key',{
       this.fill = '#fff';
     }
   }
-  
 })
+
 
 /**
  * @class phina.game.ResultScene
@@ -322,9 +414,9 @@ phina.define('ResultScene', {
 
     //this.backgroundColor = params.backgroundColor;
     if(isPPmode){
-      this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
+      this.backgroundColor = BG_COLOR_PP;
     }else{
-      this.backgroundColor = 'hsl(200, 80%, 64%)';
+      this.backgroundColor = BG_COLOR_TITLE;
       
     }
     
@@ -337,7 +429,7 @@ phina.define('ResultScene', {
             text: 'score',
             fill: params.fontColor,
             stroke: null,
-            fontSize: 48,
+            fontSize: FONTSIZE_M,
           },
           x: this.gridX.span(8),
           y: this.gridY.span(4),
@@ -348,7 +440,7 @@ phina.define('ResultScene', {
             text: params.score+'',
             fill: params.fontColor,
             stroke: null,
-            fontSize: 72,
+            fontSize: FONTSIZE_L,
           },
           x: this.gridX.span(8),
           y: this.gridY.span(6),
@@ -360,42 +452,69 @@ phina.define('ResultScene', {
             text: message,
             fill: params.fontColor,
             stroke: null,
-            fontSize: 32,
+            fontSize: FONTSIZE_M,
+            lineHeight: 1.5
           },
           x: this.gridX.center(),
           y: this.gridY.span(9),
         },
+        /*
+        messageLabel2: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: calcRanking(params.score),
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: FONTSIZE_M,
+            lineHeight: 1.5
+          },
+          x: this.gridX.center(),
+          y: this.gridY.span(14),
+        },
+        messageLabel3: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: '/ ' + STR_POPULATION + '人',
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: FONTSIZE_S,
+            lineHeight: 1.5
+          },
+          x: this.gridX.center(2),
+          y: this.gridY.span(15),
+        },
+        */
 
         shareButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: 'Tweet',
-            width: 220,
-            height: 128,
+            text: 'TWEET',
+            width: BTNSIZE_M_W,
+            height: BTNSIZE_M_H,
             fontColor: params.fontColor,
-            fontSize: 50,
+            fontSize: FONTSIZE_M,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
             // strokeWidth: 2,
           }],
-          x: this.gridX.center(-3),
+          x: this.gridX.center(-4),
           y: this.gridY.span(12),
         },
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: 'Retry',
-            width: 220,
-            height: 128,
+            text: 'TITLE',
+            width: BTNSIZE_M_W,
+            height: BTNSIZE_M_H,
             fontColor: params.fontColor,
-            fontSize: 50,
+            fontSize: FONTSIZE_M,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
             // strokeWidth: 2,
           }],
-          x: this.gridX.center(3),
+          x: this.gridX.center(4),
           y: this.gridY.span(12),
 
           interactive: true,
@@ -413,7 +532,7 @@ phina.define('ResultScene', {
     }
 
     this.shareButton.onclick = function() {
-      let text = 'SCORE:{0}\n{1}'.format(params.score,params.message);
+      let text = 'Chord Decodeをプレイ\nSCORE:{0}\n{1}'.format(params.score,params.message);
       let url = phina.social.Twitter.createURL({
         text: text,
         hashtags: '',
@@ -447,20 +566,28 @@ phina.define('TitleScene', {
   superClass: 'DisplayScene',
   // コンストラクタ
   init: function() {
-    this.superInit();
+    this.superInit(
+      {width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT});
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
       dom.addEventListener(event, (function() {
         return function f() {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
+          if(audioCtx == null){
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }else{
+            alert("reuse ctx");
+          }
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
-          oscillator.connect(audioCtx.destination);
+          let gainNode = audioCtx.createGain();
+          gainNode.gain.value = SOUND_VOLUME*0;
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
           this.oscillator = oscillator;
           this.oscillator.start();
-          setTimeout( () => { this.oscillator.stop() }, 100 );
-
+          setTimeout( () => { this.oscillator.stop() }, 100);
           dom.removeEventListener(event, f, false);
         }
       }()), false);
@@ -471,12 +598,14 @@ phina.define('TitleScene', {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();;
           let oscillator = audioCtx.createOscillator();
           oscillator.frequency.value = 440; // value in hertz
-          oscillator.connect(audioCtx.destination);
+          let gainNode = audioCtx.createGain();
+          gainNode.gain.value = SOUND_VOLUME*0;
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
           this.oscillator = oscillator;
           this.oscillator.start();
-          setTimeout( () => { this.oscillator.stop() }, 100 );
-
-          dom.removeEventListener(event2, f, false);
+          setTimeout( () => { this.oscillator.stop() }, 100);
+          dom.removeEventListener(event, f, false);
         }
       }()), false);
 
@@ -486,17 +615,27 @@ phina.define('TitleScene', {
 
     });
 
-    this.backgroundColor = 'hsl(200, 80%, 64%)';
+    
+    if(isPPmode){
+      this.backgroundColor = BG_COLOR_PP;
+      //document.body.style.backgroundColor = BG_COLOR_PP; //だめだった
+    }else{
+      this.backgroundColor = BG_COLOR_TITLE;
+      //document.body.style.backgroundColor = BG_COLOR_TITLE;
+    }
+    
+    
     this.fromJSON({
       children:{
         title: {
           className: 'phina.ui.Button',
           arguments: [{
             text: 'Chord Decode',
-            width: 1000,
-            height: 128,
+            width: 9999,
+            height: SCREEN_HEIGHT * 0.15,
             fontColor: 'black',
-            fontSize: 64,
+            fontSize: FONTSIZE_L,
+            fontFamily: "'Helvetica'", // Hiragino or Helvetica
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 1.0)',
             // stroke: '#aaa',
@@ -508,11 +647,11 @@ phina.define('TitleScene', {
           interactive: true,
           onpush: function() {
             if(isPPmode){
-              this.backgroundColor = 'hsl(200, 80%, 64%)';
+              this.backgroundColor = BG_COLOR_TITLE;
               this.messageLabel.text = "";
             }else{
-              this.backgroundColor = 'rgba(200, 24, 24, 1.0)';
-              this.messageLabel.text = "絶対音感用モード\n工事中";
+              this.backgroundColor = BG_COLOR_PP;
+              this.messageLabel.text = "絶対音感用モード";
             }
             isPPmode = !isPPmode;
             
@@ -522,10 +661,10 @@ phina.define('TitleScene', {
           className: 'phina.ui.Button',
           arguments: [{
             text: 'EASY',
-            width: 220,
-            height: 128,
+            width: BTNSIZE_M_W,
+            height: BTNSIZE_M_H,
             fontColor: 'white',
-            fontSize: 50,
+            fontSize: FONTSIZE_M,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
@@ -544,10 +683,10 @@ phina.define('TitleScene', {
           className: 'phina.ui.Button',
           arguments: [{
             text: 'NORMAL',
-            width: 220,
-            height: 128,
+            width: BTNSIZE_M_W,
+            height: BTNSIZE_M_H,
             fontColor: 'white',
-            fontSize: 50,
+            fontSize: FONTSIZE_M,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
@@ -566,10 +705,10 @@ phina.define('TitleScene', {
           className: 'phina.ui.Button',
           arguments: [{
             text: 'HARD',
-            width: 220,
-            height: 128,
+            width: BTNSIZE_M_W,
+            height: BTNSIZE_M_H,
             fontColor: 'white',
-            fontSize: 50,
+            fontSize: FONTSIZE_M,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
@@ -587,10 +726,10 @@ phina.define('TitleScene', {
         exprLabel_easy: {
           className: 'phina.display.Label',
           arguments: {
-            text: 'メジャーとマイナーの和音のみ',
+            text: 'メジャー・マイナー和音のみ',
             fill: 'white',
             stroke: null,
-            fontSize: 24,
+            fontSize: FONTSIZE_S,
           },
           x: this.gridX.span(11),
           y: this.gridY.span(8),
@@ -598,10 +737,10 @@ phina.define('TitleScene', {
         exprLabel_normal: {
           className: 'phina.display.Label',
           arguments: {
-            text: '一般的に使用される和音群',
+            text: '一般的に使用される和音たち',
             fill: 'white',
             stroke: null,
-            fontSize: 24,
+            fontSize: FONTSIZE_S,
           },
           x: this.gridX.span(11),
           y: this.gridY.span(11),
@@ -609,10 +748,10 @@ phina.define('TitleScene', {
         exprLabel_hard: {
           className: 'phina.display.Label',
           arguments: {
-            text: 'マニアック和音も含む',
+            text: 'マニアック和音も含まれます',
             fill: 'white',
             stroke: null,
-            fontSize: 24,
+            fontSize: FONTSIZE_S,
           },
           x: this.gridX.span(11),
           y: this.gridY.span(14),
@@ -623,7 +762,7 @@ phina.define('TitleScene', {
             text: "",
             fill: 'white',
             stroke: null,
-            fontSize: 32,
+            fontSize: FONTSIZE_M,
           },
           x: this.gridX.center(),
           y: this.gridY.span(6),
