@@ -21,7 +21,7 @@ function correctSound(){
   let gainNode = audioCtx.createGain();
   oscillator_correct1.type = "triangle";
   oscillator_correct1.connect(gainNode);
-  gainNode.gain.value = SOUND_VOLUME;
+  gainNode.gain.value = SOUND_VOLUME*0.1;
   gainNode.connect(audioCtx.destination);
   oscillator_correct1.start();
   oscillator_correct1.stop(audioCtx.currentTime + sec);
@@ -32,7 +32,7 @@ function correctSound(){
   let gainNode2 = audioCtx.createGain();
   oscillator_correct2.type = "sine";
   oscillator_correct2.connect(gainNode2);
-  gainNode2.gain.value = SOUND_VOLUME;
+  gainNode2.gain.value = SOUND_VOLUME*0.1;
   gainNode2.connect(audioCtx.destination);
   oscillator_correct2.start(audioCtx.currentTime + sec);
   oscillator_correct2.stop(audioCtx.currentTime + sec + sec);
@@ -246,7 +246,7 @@ phina.define("MainScene", {
     timerLabel.origin.x = 1;
     timerLabel.x = SCREEN_WIDTH * 0.92;
     timerLabel.y = SCREEN_HEIGHT * 0.05;
-    timerLabel.fill = '#444';
+    timerLabel.fill = '#fff';
     timerLabel.fontSize = FONTSIZE_S;
     // timerLabel.align = 'right';
     timerLabel.baseline = 'bottom';
