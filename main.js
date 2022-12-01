@@ -417,6 +417,9 @@ phina.define('ResultScene', {
    */
   init: function(params) {
     this.superInit(params);
+    let canvas = phina.graphics.Canvas()
+    let ctx = canvas.context;
+    ctx.scale(2,2);
 
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
 
@@ -483,7 +486,7 @@ phina.define('ResultScene', {
             fontSize: FONTSIZE_MS,
           },
           x: this.gridX.span(11),
-          y: this.gridY.span(6.5),
+          y: this.gridY.span(6.7),
         },
         messageLabel: {
           className: 'phina.display.Label',
@@ -564,7 +567,8 @@ phina.define('ResultScene', {
         },
       }
     });
-
+    
+    this.CompLastScoreLabel.tweener.fadeOut(600).fadeIn(600).setLoop(true).play();
     if (params.exitType === 'touch') {
       this.on('pointend', function() {
         this.exit();
@@ -606,9 +610,13 @@ phina.define('TitleScene', {
   superClass: 'DisplayScene',
   // コンストラクタ
   init: function() {
+    
     this.superInit(
       {width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT});
+    let canvas = phina.graphics.Canvas()
+    let ctx = canvas.context;
+    ctx.scale(2,2);
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
@@ -692,6 +700,7 @@ phina.define('TitleScene', {
             }else{
               this.backgroundColor = BG_COLOR_PP;
               this.messageLabel.text = "絶対音感用モード";
+              this.messageLabel.tweener.fadeOut(600).fadeIn(600).setLoop(true).play();
             }
             isPPmode = !isPPmode;
             
