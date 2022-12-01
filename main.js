@@ -827,7 +827,7 @@ phina.main(function() {
 
   //app.enableStats();
   let canvas = phina.graphics.Canvas()
-  const ctx = canvas.context;
+  let ctx = canvas.context;
   ctx.scale(2,2);
   //alert(scale)
   app.run();
