@@ -4,13 +4,18 @@
  */
 "use strict";
 
+
+
 phina.globalize();
+
+
 
 var audioCtx=null; //音を鳴らすやつはglobalに　実際にインスタンスを作るのはユーザー入力を待たないといけない仕様に注意
 var oscillator_correct1,oscillator_correct2;
 var oscillator_chords = [];
 var _tmpChord;
 var _chordPush = 0;
+var _lastScore = -1;
 //var firstPush = true;
 
 function correctSound(){
@@ -201,7 +206,7 @@ phina.define("MainScene", {
     question.text = _tmpChord.name;
     this.question = question;
     if(isPPmode){
-      this.question.text = "???";
+      this.question.text = "TOUCH";
     }
 
     var bit_db = Label(-1); //.addChildTo(this);
@@ -268,7 +273,7 @@ phina.define("MainScene", {
     var scene = CountScene({
       backgroundColor: 'rgba(100, 100, 100, 1)',
       count: ['Ready'],
-      fontSize: 100,
+      fontSize: FONTSIZE_L,
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
@@ -285,7 +290,9 @@ phina.define("MainScene", {
       oscillator_chords = stopTmpChord(oscillator_chords);
       audioCtx = null;
       this.keyButtons = null;
-      this.exit({score: totalScore,message:finalMessage});
+      let _passingScore = _lastScore;
+      _lastScore = totalScore;
+      this.exit({score: totalScore, message:finalMessage, lastScore:_passingScore});
     }
     let sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
@@ -422,7 +429,15 @@ phina.define('ResultScene', {
       this.backgroundColor = BG_COLOR_TITLE;
       
     }
-    
+
+    let _lasttext = '';
+    if(params.lastScore >= 0){
+      _lasttext = '前回:' + params.lastScore;
+    }
+    let _comptext = '';
+    if(params.lastScore >= 0 && params.score > params.lastScore){
+      _comptext = (params.score - params.lastScore) + '点アップ！';
+    }
 
     this.fromJSON({
       children: {
@@ -435,7 +450,7 @@ phina.define('ResultScene', {
             fontSize: FONTSIZE_M,
           },
           x: this.gridX.span(8),
-          y: this.gridY.span(4),
+          y: this.gridY.span(3),
         },
         scoreLabel: {
           className: 'phina.display.Label',
@@ -446,9 +461,30 @@ phina.define('ResultScene', {
             fontSize: FONTSIZE_L,
           },
           x: this.gridX.span(8),
+          y: this.gridY.span(5),
+        },
+        lastScoreLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: _lasttext,
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: FONTSIZE_S,
+          },
+          x: this.gridX.span(11),
           y: this.gridY.span(6),
         },
-
+        CompLastScoreLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: _comptext,
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: FONTSIZE_MS,
+          },
+          x: this.gridX.span(11),
+          y: this.gridY.span(6.5),
+        },
         messageLabel: {
           className: 'phina.display.Label',
           arguments: {
@@ -491,34 +527,35 @@ phina.define('ResultScene', {
         shareButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: 'TWEET',
-            width: BTNSIZE_M_W,
-            height: BTNSIZE_M_H,
+            text: 'つぶやく',
+            width: BTNSIZE_L_W,
+            height: BTNSIZE_L_H,
             fontColor: params.fontColor,
-            fontSize: FONTSIZE_M,
+            fontSize: FONTSIZE_L,
             //cornerRadius: 64,
+            backgroundColor: 'transparent',
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
             // strokeWidth: 2,
           }],
-          x: this.gridX.center(-4),
-          y: this.gridY.span(12),
+          x: this.gridX.center(0),
+          y: this.gridY.span(13),
         },
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: 'TITLE',
-            width: BTNSIZE_M_W,
-            height: BTNSIZE_M_H,
+            text: 'タイトル',
+            width: BTNSIZE_S_W,
+            height: BTNSIZE_S_H,
             fontColor: params.fontColor,
-            fontSize: FONTSIZE_M,
+            fontSize: FONTSIZE_S,
             //cornerRadius: 64,
             fill: 'rgba(240, 240, 240, 0.5)',
             // stroke: '#aaa',
             // strokeWidth: 2,
           }],
-          x: this.gridX.center(4),
-          y: this.gridY.span(12),
+          x: this.gridX.center(6),
+          y: this.gridY.span(1),
 
           interactive: true,
           onpush: function() {
@@ -679,6 +716,7 @@ phina.define('TitleScene', {
           interactive: true,
           onpush: function() {
             DIFFICULTY=0;
+            TIME_LIMIT = TIME_LIMIT_BASE * 2; //制限時間倍増
             this.exit();
           }.bind(this),
         },
@@ -701,6 +739,7 @@ phina.define('TitleScene', {
           interactive: true,
           onpush: function() {
             DIFFICULTY=1;
+            TIME_LIMIT = TIME_LIMIT_BASE;
             this.exit();
           }.bind(this),
         },
@@ -723,6 +762,7 @@ phina.define('TitleScene', {
           interactive: true,
           onpush: function() {
             DIFFICULTY=2;
+            TIME_LIMIT = TIME_LIMIT_BASE;
             this.exit();
           }.bind(this),
         },
@@ -734,7 +774,7 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11),
+          x: this.gridX.span(11.5),
           y: this.gridY.span(8),
         },
         exprLabel_normal: {
@@ -745,7 +785,7 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11),
+          x: this.gridX.span(11.5),
           y: this.gridY.span(11),
         },
         exprLabel_hard: {
@@ -756,7 +796,7 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11),
+          x: this.gridX.span(11.5),
           y: this.gridY.span(14),
         },
         messageLabel: {
@@ -772,27 +812,6 @@ phina.define('TitleScene', {
         },
       }
     })
-    /*
-    // タイトル
-    Label({
-      text: 'Chord Decode',
-      fontSize: 64,
-      fill:'white',
-    }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.span(4));
-
-    */
-    /*Label({
-      text: "TOUCH START",
-      fontSize: 32,
-    }).addChildTo(this)
-      .setPosition(this.gridX.center(), this.gridY.span(12))
-      .tweener.fadeOut(1000).fadeIn(500).setLoop(true).play();
-    // 画面タッチ時
-    this.on('pointend', function() {
-      // 次のシーンへ
-      this.exit();
-    });
-    */
   },
 });
 
@@ -807,6 +826,9 @@ phina.main(function() {
   });
 
   //app.enableStats();
-
+  let canvas = phina.graphics.Canvas()
+  const ctx = canvas.context;
+  ctx.scale(2,2);
+  //alert(scale)
   app.run();
 });

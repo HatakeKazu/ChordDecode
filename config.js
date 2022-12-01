@@ -2,7 +2,7 @@
 
 const SCREEN_HEIGHT   = window.innerHeight; //960
 const SCREEN_WIDTH    =  SCREEN_HEIGHT*2 / 3; //640;
-const BOARD_PADDING   = 2;
+const BOARD_PADDING   = 0;
 
 const WHITEKEY_WIDTH = SCREEN_WIDTH /10; //白鍵の数
 const BLACKKEY_WIDTH = (SCREEN_WIDTH / 10) * 0.85 ; //若干小さく
@@ -10,7 +10,7 @@ const WHITEKEY_HEIGHT= WHITEKEY_WIDTH * 5;
 const BLACKKEY_HEIGHT= WHITEKEY_HEIGHT * 0.5;
 
 const HUCHI = 8;
-const KEYBOARD_OFFSET_X = WHITEKEY_WIDTH * 0.3; //白鍵何個分でオフセット
+const KEYBOARD_OFFSET_X = WHITEKEY_WIDTH * 0.2; //白鍵何個分でオフセット
 const KEYBOARD_OFFSET_Y = SCREEN_HEIGHT / 3;
 const BLACK_OFFSET_1ST = WHITEKEY_WIDTH / 1.5;
 const BLACK_OFFSET_2ND = 1.8 * WHITEKEY_WIDTH;
@@ -19,15 +19,17 @@ const BOARD_SIZE      = SCREEN_WIDTH - BOARD_PADDING*2;
 const BOARD_OFFSET_X  = BOARD_PADDING+40;
 
 const FONTSIZE_L = SCREEN_WIDTH * 0.13;
-const FONTSIZE_M = SCREEN_WIDTH * 0.065;
-const FONTSIZE_MS = SCREEN_WIDTH * 0.04;
+const FONTSIZE_M = SCREEN_WIDTH * 0.07;
+const FONTSIZE_MS = SCREEN_WIDTH * 0.05;
 const FONTSIZE_S = SCREEN_WIDTH * 0.03;
 
+
+const BTNSIZE_L_W = SCREEN_WIDTH * 0.6;
+const BTNSIZE_L_H = BTNSIZE_L_W * 9 / 16;
 const BTNSIZE_M_W = SCREEN_WIDTH * 0.4;
 const BTNSIZE_M_H = BTNSIZE_M_W * 9 / 16;
-
-const BTNSIZE_L_W = SCREEN_WIDTH * 0.8;
-const BTNSIZE_L_H = BTNSIZE_L_W * 9 / 16;
+const BTNSIZE_S_W = SCREEN_WIDTH * 0.2;
+const BTNSIZE_S_H = BTNSIZE_S_W * 12 / 16;
 
 const numbers = [0,2,4,5,7,9,11,12,1,3,6,8,10]; //白鍵を先に配置
 const whitekeys = [0,2,4,5,7,9,11,12];
@@ -99,14 +101,15 @@ const FADE_OUT_SEC = 0.2;
 var DIFFICULTY = -1; //0:easy,1;normal,2:hard
 const TYPE_LIMIT_BEGIN=[0,0,5];
 const TYPE_LIMIT_END = [2,6,CHORD_TYPE.length]; //difficultyに対応
-const TIME_LIMIT = 15; //秒数制限でのスコアアタックにしたい
+const TIME_LIMIT_BASE = 20;
+var TIME_LIMIT = -1; //秒数制限でのスコアアタックにしたい
 
 const score_dif_coef = [1.0, 1.5, 2.0];
 const score_per_q = 1200;
 var isPPmode = 0>1; //is PerfectPitch mode
 
 const evalScore_init = 1000;
-const evalScore_rank = 1000;
+const evalScore_rank = 2000;
 
 const score_top30 = 3000;
 const score_top60 = 2000;
@@ -121,6 +124,8 @@ const msgList = ["かけだしコードニスト"
             ,"構成音の申し子"
             ,"コード完全に理解した"
             ,"コードマニア"
+            ,"コードがわかるってコト？"
+            ,"3度の飯よりコード"
             ,"コードは友達"
             ,"親の顔より見たコード"
             ,"洗練された理解力"
