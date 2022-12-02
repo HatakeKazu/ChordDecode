@@ -104,7 +104,7 @@ phina.define("MainScene", {
     });
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(5,5);
+    ctx.scale(4,4);
 
     //UI関連
     var self = this;
@@ -619,7 +619,7 @@ phina.define('TitleScene', {
       height: SCREEN_HEIGHT});
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(5,5);
+    ctx.scale(4,4);
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
@@ -840,7 +840,7 @@ phina.main(function() {
   //app.enableStats();
   let canvas = phina.graphics.Canvas()
   let ctx = canvas.context;
-  ctx.scale(5,5);
+  ctx.scale(4,4);
   //alert(scale)
   app.run();
 });
