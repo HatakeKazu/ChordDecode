@@ -16,6 +16,7 @@ var oscillator_chords = [];
 var _tmpChord;
 var _chordPush = 0;
 var _lastScore = -1;
+var canceled  = false; //ここに置くのきもすぎるが動かないので仕方なし
 //var firstPush = true;
 
 function correctSound(){
@@ -185,7 +186,7 @@ phina.define("MainScene", {
     this.currentChord_key_bit = _tmpChord.key_bit;
     
     this._keyUpdate = false; //1個押されたら次のフレームまで他は発火させない
-
+    this.canceled = false;
     //var question = Label('Xm').addChildTo(this);
     let _q_col;
     if(isPPmode){
@@ -213,6 +214,13 @@ phina.define("MainScene", {
       this.question.text = "TOUCH";
     }
 
+    var midExit = Button({text:"最初から",backgroundColor: 'transparent',
+    fill: 'rgba(240, 240, 240, 0.5)',width:BTNSIZE_S_W,height:BTNSIZE_S_H,fontSize:FONTSIZE_S}).addChildTo(this);
+    midExit.setInteractive(true);
+    midExit.setPosition(SCREEN_WIDTH * 0.12, SCREEN_HEIGHT * 0.07);
+    midExit.onpointstart = function(){
+      canceled = true;
+    };
     var bit_db = Label(-1); //.addChildTo(this);
     bit_db.setPosition(this.gridX.span(), this.gridY.span(15));
     bit_db.text = this.user_key_bit;
@@ -285,6 +293,12 @@ phina.define("MainScene", {
   },
 
   update: function(app) {
+    
+    if(canceled){
+      canceled = false;
+      this.exit('title');
+    }
+    
     // タイマーを更新
     this.time -= app.ticker.deltaTime;
     if(this.time <= 0){
@@ -298,6 +312,7 @@ phina.define("MainScene", {
       _lastScore = totalScore;
       this.exit({score: totalScore, message:finalMessage, lastScore:_passingScore});
     }
+    
     let sec = this.time/1000; // 秒数に変換
     this.timerLabel.text = sec.toFixed(3);
     this._keyUpdate = false;
