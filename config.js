@@ -19,6 +19,7 @@ const BOARD_SIZE      = SCREEN_WIDTH - BOARD_PADDING*2;
 const BOARD_OFFSET_X  = BOARD_PADDING+40;
 
 const FONTSIZE_L = SCREEN_WIDTH * 0.13;
+const FONTSIZE_ML = SCREEN_WIDTH * 0.10;
 const FONTSIZE_M = SCREEN_WIDTH * 0.07;
 const FONTSIZE_MS = SCREEN_WIDTH * 0.05;
 const FONTSIZE_S = SCREEN_WIDTH * 0.04;
@@ -129,6 +130,6 @@ const msgList = ["かけだしコードニスト"
             ,"コードは友達"
             ,"親の顔より見たコード"
             ,"洗練された理解力"
-            ,"もはや自分自身がコード"
+            ,"もはや自身がコード"
             ,"人智を超えた構成音力"
             ,"コード界の神"]

@@ -102,6 +102,9 @@ phina.define("MainScene", {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
+    let canvas = phina.graphics.Canvas()
+    let ctx = canvas.context;
+    ctx.scale(5,5);
 
     //UI関連
     var self = this;
@@ -419,7 +422,7 @@ phina.define('ResultScene', {
     this.superInit(params);
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(2,2);
+    ctx.scale(4,4);
 
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
 
@@ -534,7 +537,7 @@ phina.define('ResultScene', {
             width: BTNSIZE_L_W,
             height: BTNSIZE_L_H,
             fontColor: params.fontColor,
-            fontSize: FONTSIZE_L,
+            fontSize: FONTSIZE_ML,
             //cornerRadius: 64,
             backgroundColor: 'transparent',
             fill: 'rgba(240, 240, 240, 0.5)',
@@ -547,7 +550,7 @@ phina.define('ResultScene', {
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: 'タイトル',
+            text: '再挑戦',
             width: BTNSIZE_S_W,
             height: BTNSIZE_S_H,
             fontColor: params.fontColor,
@@ -616,7 +619,7 @@ phina.define('TitleScene', {
       height: SCREEN_HEIGHT});
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(2,2);
+    ctx.scale(5,5);
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
@@ -837,7 +840,7 @@ phina.main(function() {
   //app.enableStats();
   let canvas = phina.graphics.Canvas()
   let ctx = canvas.context;
-  ctx.scale(2,2);
+  ctx.scale(5,5);
   //alert(scale)
   app.run();
 });
