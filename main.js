@@ -841,10 +841,7 @@ phina.main(function() {
   });
 
   //app.enableStats();
-  var dpr = window.devicePixelRatio;
-  let canvas = phina.graphics.Canvas()
-  let ctx = canvas.context;
-  ctx.scale(dpr,dpr);
+  
   //alert(scale)
   app.run();
 });
