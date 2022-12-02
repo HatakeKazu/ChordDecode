@@ -102,9 +102,10 @@ phina.define("MainScene", {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
+    var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(4,4);
+    ctx.scale(dpr,dpr);
 
     //UI関連
     var self = this;
