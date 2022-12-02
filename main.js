@@ -420,9 +420,10 @@ phina.define('ResultScene', {
    */
   init: function(params) {
     this.superInit(params);
+    var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(4,4);
+    ctx.scale(dpr,dpr);
 
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
 
@@ -466,8 +467,8 @@ phina.define('ResultScene', {
             stroke: null,
             fontSize: FONTSIZE_L,
           },
-          x: this.gridX.span(8),
-          y: this.gridY.span(5),
+          x: Math.floor(this.gridX.span(8)),
+          y: Math.floor(this.gridY.span(5)),
         },
         lastScoreLabel: {
           className: 'phina.display.Label',
@@ -500,8 +501,8 @@ phina.define('ResultScene', {
             fontSize: FONTSIZE_MS,
             lineHeight: 1.5
           },
-          x: this.gridX.center(),
-          y: this.gridY.span(9),
+          x: Math.floor(this.gridX.center()),
+          y: Math.floor(this.gridY.span(9)),
         },
         /*
         messageLabel2: {
@@ -617,9 +618,10 @@ phina.define('TitleScene', {
     this.superInit(
       {width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT});
+    var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(4,4);
+    ctx.scale(dpr,dpr);
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
@@ -786,8 +788,8 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11.5),
-          y: this.gridY.span(8),
+          x: Math.floor(this.gridX.span(11.5)),
+          y: Math.floor(this.gridY.span(8)),
         },
         exprLabel_normal: {
           className: 'phina.display.Label',
@@ -797,8 +799,8 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11.5),
-          y: this.gridY.span(11),
+          x: Math.floor(this.gridX.span(11.5)),
+          y: Math.floor(this.gridY.span(11)),
         },
         exprLabel_hard: {
           className: 'phina.display.Label',
@@ -808,8 +810,8 @@ phina.define('TitleScene', {
             stroke: null,
             fontSize: FONTSIZE_S,
           },
-          x: this.gridX.span(11.5),
-          y: this.gridY.span(14),
+          x: Math.floor(this.gridX.span(11.5)),
+          y: Math.floor(this.gridY.span(14)),
         },
         messageLabel: {
           className: 'phina.display.Label',
@@ -838,9 +840,10 @@ phina.main(function() {
   });
 
   //app.enableStats();
+  var dpr = window.devicePixelRatio;
   let canvas = phina.graphics.Canvas()
   let ctx = canvas.context;
-  ctx.scale(4,4);
+  ctx.scale(dpr,dpr);
   //alert(scale)
   app.run();
 });
