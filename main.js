@@ -106,7 +106,8 @@ phina.define("MainScene", {
     var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(dpr,dpr);
+    //ctx.scale(dpr,dpr);
+    ctx.scale(4,4);
 
     //UI関連
     var self = this;
@@ -439,7 +440,8 @@ phina.define('ResultScene', {
     var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(dpr,dpr);
+    //ctx.scale(dpr,dpr);
+    ctx.scale(4,4);
 
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
 
@@ -637,7 +639,8 @@ phina.define('TitleScene', {
     var dpr = window.devicePixelRatio;
     let canvas = phina.graphics.Canvas()
     let ctx = canvas.context;
-    ctx.scale(dpr,dpr);
+    //ctx.scale(dpr,dpr);
+    ctx.scale(4,4);
     this.on('enter', function() {
       let event = "touchstart"; //for iPhone
       let dom = this.app.domElement;
